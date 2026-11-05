@@ -1,0 +1,246 @@
+---
+import ThemePicker from './ThemePicker.astro';
+
+const navTabs = [
+  { label: 'about.py', href: '#about', icon: 'py', color: 'text-primary' },
+  { label: 'projects.md', href: '#projects', icon: 'M↓', color: 'text-blue-400' },
+  { label: 'experience.json', href: '#experience', icon: '{ }', color: 'text-yellow-400' },
+  { label: 'contact.sh', href: '#contact', icon: 'sh', color: 'text-accent-green' },
+];
+---
+
+<header
+  class="sticky top-0 z-50 w-full bg-ide-gray border-b border-ide-border flex items-center h-12 px-2 md:px-4 gap-1"
+  id="ide-tabs"
+>
+  <!-- Logo -->
+  <div class="flex items-center gap-2 pr-3 border-r border-ide-border mr-1 shrink-0">
+    <span class="material-symbols-outlined text-primary text-sm">terminal</span>
+    <span class="text-xs font-mono font-medium tracking-tight hidden sm:inline">infra.lab</span>
+  </div>
+
+  <!-- Tabs (scrollable on mobile) -->
+  <nav class="flex h-full overflow-x-auto scrollbar-none" id="tab-nav">
+    {navTabs.map((tab, idx) => (
+      <div
+        class={`flex items-center gap-1.5 px-2.5 md:px-4 h-full text-[11px] md:text-xs font-mono transition-colors shrink-0 group ${
+          idx === 0 ? 'bg-bg-dark border-t-2 border-primary' : 'opacity-60 hover:bg-white/5'
+        }`}
+        data-tab
+        data-section={tab.href.replace('#', '')}
+      >
+        <a href={tab.href} class="flex items-center gap-1.5 h-full">
+          <span class={`${tab.color} text-[10px]`}>{tab.icon}</span>
+          <span class="hidden xs:inline">{tab.label}</span>
+          <span class="xs:hidden">{tab.label.split('.')[0]}</span>
+        </a>
+        <button
+          class="material-symbols-outlined text-[10px] opacity-0 group-hover:opacity-50 hover:!opacity-100 transition-opacity cursor-pointer"
+          data-close-tab
+          title="Close tab"
+        >
+          close
+        </button>
+      </div>
+    ))}
+  </nav>
+
+  <!-- Restore closed tabs button (hidden until tabs are closed) -->
+  <button
+    id="restore-tabs-btn"
+    class="flex items-center gap-1 px-2 py-1 text-[10px] font-mono text-gray-500 hover:text-primary hover:bg-white/5 rounded transition-all cursor-pointer shrink-0"
+    style="display: none;"
+    title="Restore closed tabs (Ctrl+Z)"
+  >
+    <span class="material-symbols-outlined text-xs">tab_unselected</span>
+    <span class="hidden md:inline">Restore</span>
+  </button>
+
+  <!-- Right side -->
+  <div class="ml-auto flex items-center gap-2 px-1 md:px-2 shrink-0">
+    <button
+      id="open-portfolio-terminal"
+      type="button"
+      title="Open terminal (Ctrl+K)"
+      aria-label="Open terminal"
+      class="rounded border border-ide-border px-2 py-1 text-xs font-mono hover:text-primary hover:border-primary"
+    >
+      &gt;_
+      <span class="hidden md:inline"> Terminal</span>
+    </button>
+    <ThemePicker />
+  </div>
+</header>
+
+<style>
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+</style>
+
+<script>
+  const allTabs = document.querySelectorAll('[data-tab]');
+  const sections = ['about', 'projects', 'experience', 'contact'];
+  const restoreBtn = document.getElementById('restore-tabs-btn');
+  const closedTabs: string[] = [];
+
+  let clickedTab: string | null = null;
+  let clickTimeout: ReturnType<typeof setTimeout> | null = null;
+
+  // Click on tab link → force active
+  allTabs.forEach((tab) => {
+    const link = tab.querySelector('a');
+    if (link) {
+      link.addEventListener('click', () => {
+        const sectionId = tab.getAttribute('data-section');
+        if (!sectionId) return;
+        clickedTab = sectionId;
+        if (clickTimeout) clearTimeout(clickTimeout);
+        clickTimeout = setTimeout(() => {
+          clickedTab = null;
+        }, 1000);
+        applyActiveTab(sectionId);
+      });
+    }
+  });
+
+  // Close tab
+  document.querySelectorAll('[data-close-tab]').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const tabEl = (btn as HTMLElement).closest('[data-tab]') as HTMLElement;
+      if (!tabEl) return;
+      const sectionId = tabEl.getAttribute('data-section');
+      if (!sectionId) return;
+
+      // Closing a tab removes its navigation shortcut.
+      // The corresponding content remains visible.
+      tabEl.style.display = 'none';
+
+      // Track closed tab
+      closedTabs.push(sectionId);
+      updateRestoreBtn();
+
+      // Switch to first visible tab
+      const remaining = Array.from(allTabs).filter(
+        (t) => (t as HTMLElement).style.display !== 'none',
+      );
+      if (remaining.length > 0) {
+        const firstId = remaining[0].getAttribute('data-section') || sections[0];
+        applyActiveTab(firstId);
+        const targetEl = document.getElementById(firstId);
+        if (targetEl) targetEl.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+  });
+
+  // Restore all closed tabs
+  function restoreAll() {
+    while (closedTabs.length > 0) {
+      const sectionId = closedTabs.pop()!;
+      allTabs.forEach((tab) => {
+        if (tab.getAttribute('data-section') === sectionId) {
+          (tab as HTMLElement).style.display = '';
+        }
+      });
+      const sectionEl = document.getElementById(sectionId);
+      if (sectionEl) (sectionEl as HTMLElement).style.display = '';
+    }
+    updateRestoreBtn();
+  }
+
+  if (restoreBtn) {
+    restoreBtn.addEventListener('click', restoreAll);
+  }
+
+  // Alt+W (Option+W on macOS) to close active tab
+  document.addEventListener('keydown', (e) => {
+    if (e.altKey && !e.ctrlKey && !e.metaKey && e.code === 'KeyW') {
+      e.preventDefault();
+
+      // Find the currently active (visible + highlighted) tab
+      const activeTab = Array.from(allTabs).find(
+        (tab) =>
+          tab.classList.contains('border-primary') && (tab as HTMLElement).style.display !== 'none',
+      ) as HTMLElement | undefined;
+
+      if (!activeTab) return;
+
+      const closeBtn = activeTab.querySelector('[data-close-tab]') as HTMLElement;
+      if (closeBtn) closeBtn.click();
+    }
+  });
+
+  // Ctrl+Z to restore last closed tab
+  document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
+      if (closedTabs.length === 0) return;
+      e.preventDefault();
+      const sectionId = closedTabs.pop()!;
+      allTabs.forEach((tab) => {
+        if (tab.getAttribute('data-section') === sectionId) {
+          (tab as HTMLElement).style.display = '';
+        }
+      });
+      const sectionEl = document.getElementById(sectionId);
+      if (sectionEl) (sectionEl as HTMLElement).style.display = '';
+      applyActiveTab(sectionId);
+      updateRestoreBtn();
+      if (sectionEl) sectionEl.scrollIntoView({ behavior: 'smooth' });
+    }
+  });
+
+  function updateRestoreBtn() {
+    if (restoreBtn) {
+      restoreBtn.style.display = closedTabs.length > 0 ? '' : 'none';
+    }
+  }
+
+  function applyActiveTab(activeId: string) {
+    allTabs.forEach((tab) => {
+      const sectionId = tab.getAttribute('data-section');
+      if (sectionId === activeId) {
+        tab.classList.add('bg-bg-dark', 'border-t-2', 'border-primary');
+        tab.classList.remove('opacity-60', 'hover:bg-white/5');
+      } else {
+        tab.classList.remove('bg-bg-dark', 'border-t-2', 'border-primary');
+        tab.classList.add('opacity-60', 'hover:bg-white/5');
+      }
+    });
+  }
+
+  function updateActiveTab() {
+    if (clickedTab) return;
+
+    const visibleSections = sections.filter((id) => {
+      const el = document.getElementById(id);
+      return el && (el as HTMLElement).style.display !== 'none';
+    });
+    if (visibleSections.length === 0) return;
+
+    const scrollPos = window.scrollY + 120;
+    let currentSection = visibleSections[0];
+
+    for (const id of visibleSections) {
+      const el = document.getElementById(id);
+      if (el && el.offsetTop <= scrollPos) {
+        currentSection = id;
+      }
+    }
+
+    if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 20) {
+      currentSection = visibleSections[visibleSections.length - 1];
+    }
+
+    applyActiveTab(currentSection);
+  }
+
+  window.addEventListener('scroll', updateActiveTab, { passive: true });
+  updateActiveTab();
+</script>

@@ -26,6 +26,16 @@ technical decisions, verification, failures, and recovery.
 The frontend will be adapted from the MIT-licensed HoPHNi
 portfolio template.
 
+## Local container configuration
+
+Docker Compose uses a local `.env` file for the container UID/GID.
+Generate it on a rootful Docker host with:
+
+    printf 'RUN_AS=%s:%s\n' "$(id -u)" "$(id -g)" > .env
+    chmod 600 .env
+
+See `.env.example` and `docs/DEVELOPMENT.md` for details.
+
 ## Development
 
 Once the Astro source is imported, local development will use:

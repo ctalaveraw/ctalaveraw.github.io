@@ -1,0 +1,42 @@
+---
+import { getCollection } from 'astro:content';
+
+const entries = await getCollection('contacts');
+const contact = entries[0]?.data;
+---
+
+<section id="contact" class="max-w-6xl mx-auto px-5 pb-24">
+  <div class="border border-ide-border rounded-lg bg-ide-gray/30 p-6">
+    <h2 class="font-mono text-xl font-semibold mb-3">contact.sh</h2>
+
+    <p class="text-sm text-gray-400 mb-5">Source code, contributions, and ways to get in touch.</p>
+
+    <div class="flex flex-wrap gap-3">
+      {(contact?.links ?? []).map((link) => (
+        <a
+          href={link.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="border border-ide-border rounded px-3 py-2 text-sm font-mono hover:border-primary hover:text-primary"
+        >
+          {link.label}
+        </a>
+      ))}
+    </div>
+  </div>
+</section>
+
+<footer class="fixed bottom-0 inset-x-0 z-50 bg-ide-status border-t border-ide-border h-7 px-4 flex items-center justify-between gap-3 text-[11px] font-mono">
+  <span class="text-accent-green">Static site · Astro</span>
+
+  <span class="hidden sm:inline text-gray-400">Terminal: Ctrl+K</span>
+
+  <a
+    href="https://github.com/HoPHNiDev/hophni.dev"
+    target="_blank"
+    rel="noopener noreferrer"
+    class="text-primary hover:underline"
+  >
+    Based on HoPHNi
+  </a>
+</footer>

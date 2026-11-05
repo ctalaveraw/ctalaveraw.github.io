@@ -1,0 +1,143 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-primary: #00e5ff;
+  --color-accent-green: #00ff00;
+  --color-bg-dark: #0d1117;
+  --color-ide-gray: #161b22;
+  --color-ide-border: #30363d;
+  --color-ide-status: #21262d;
+  --color-syntax-keyword: #ff79c6;
+  --color-syntax-string: #50fa7b;
+  --color-syntax-comment: #8b949e;
+  --font-display: 'Inter', sans-serif;
+  --font-mono: 'Fira Code', monospace;
+}
+
+body {
+  font-family: var(--font-display);
+  background-color: var(--color-bg-dark);
+  color: var(--color-foreground, #e6edf3);
+  min-height: 100vh;
+}
+
+::selection {
+  background-color: color-mix(in srgb, var(--color-primary), transparent 70%);
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+.terminal-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.code-glow {
+  transition:
+    box-shadow 0.3s ease,
+    border-color 0.3s ease;
+}
+.code-glow:hover {
+  box-shadow: 0 0 20px color-mix(in srgb, var(--color-primary), transparent 85%);
+  border-color: var(--color-primary);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-bg-dark);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-ide-border);
+  border-radius: 5px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #484f58;
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+.cursor-blink {
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-reveal {
+  animation: fadeInUp 0.6s ease-out both;
+}
+
+@keyframes peek {
+  0%,
+  100% {
+    transform: translateY(100%);
+  }
+  10%,
+  90% {
+    transform: translateY(20%);
+  }
+}
+.stitch-peek {
+  animation: peek 12s ease-in-out infinite;
+  animation-delay: 5s;
+}
+.stitch-peek:hover {
+  animation: none;
+  transform: translateY(100%);
+  transition: transform 0.3s ease-in;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+.terminal-slide {
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes glitch {
+  0%,
+  100% {
+    transform: none;
+  }
+  20% {
+    transform: translate(-2px, 2px);
+  }
+  40% {
+    transform: translate(2px, -2px);
+  }
+  60% {
+    transform: translate(-1px, -1px);
+  }
+  80% {
+    transform: translate(1px, 1px);
+  }
+}
+.glitch-effect {
+  animation: glitch 0.3s ease-in-out;
+}

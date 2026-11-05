@@ -1,0 +1,87 @@
+---
+import { getCollection, render } from 'astro:content';
+
+const experiences = await getCollection('experience');
+const sorted = experiences.sort((a, b) => a.data.order - b.data.order);
+
+const rendered = await Promise.all(
+  sorted.map(async (exp) => {
+    const { Content } = await render(exp);
+    return { data: exp.data, Content };
+  }),
+);
+---
+
+<section class="space-y-8" id="experience">
+  <div class="flex items-center gap-4 animate-reveal">
+    <h2 class="text-2xl font-bold" style="font-family: var(--font-display);">
+      Experience.json
+    </h2>
+    <div class="h-px flex-1 bg-ide-border"></div>
+  </div>
+
+  <div class="font-mono text-sm border-l-2 border-ide-border ml-4 pl-8 space-y-12">
+    {rendered.map(({ data, Content }, idx) => (
+      <div class="relative animate-reveal" style={`animation-delay: ${idx * 0.1}s`}>
+        {/* Timeline dot */}
+        <div
+          class={`absolute -left-[41px] top-0 w-4 h-4 rounded-full border-4 border-bg-dark ${data.current ? 'bg-primary' : 'bg-ide-border'}`}
+        ></div>
+
+        <div
+          class={`p-6 bg-ide-gray/40 rounded-lg border border-ide-border code-glow transition-all duration-300 ${!data.current ? 'opacity-80 hover:opacity-100' : ''}`}
+        >
+          {/* Comment header */}
+          <div class="text-syntax-comment mb-2">
+            // {data.current ? 'Current Role' : data.period}
+          </div>
+
+          <div class="space-y-1">
+            <div>{'{'}</div>
+            <div class="pl-4">
+              "<span class="text-primary">company</span>": "
+              <span class="text-syntax-string">{data.company}</span>",
+            </div>
+            <div class="pl-4">
+              "<span class="text-primary">role</span>": "
+              <span class="text-syntax-string">{data.role}</span>",
+            </div>
+            <div class="pl-4">
+              "<span class="text-primary">period</span>": "
+              <span class="text-syntax-string">{data.period}</span>",
+            </div>
+            {data.description && (
+              <div class="pl-4">
+                "<span class="text-primary">project</span>": "
+                <span class="text-syntax-string">{data.description}</span>",
+              </div>
+            )}
+            <div class="pl-4">
+              "<span class="text-primary">stack</span>": [
+              {data.stack.map((s, i) => (
+                <>
+                  <span class="tech-badge text-syntax-string hover:text-accent-green/80 transition-colors cursor-pointer">
+                    "{s}"
+                  </span>
+                  {i < data.stack.length - 1 ? ', ' : ''}
+                </>
+              ))}
+              ],
+            </div>
+            <div class="pl-4">
+              "<span class="text-primary">highlights</span>": [
+            </div>
+
+            {/* Render markdown content as code comments */}
+            <div class="pl-8 text-syntax-comment [&_li]:list-none [&_ul]:space-y-1 [&_strong]:text-accent-green/80 [&_strong]:font-normal">
+              <Content />
+            </div>
+
+            <div class="pl-4">]</div>
+            <div>{'}'}</div>
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+</section>

@@ -1,0 +1,478 @@
+---
+import { getCollection } from 'astro:content';
+
+const profile = (await getCollection('hero'))[0]?.data;
+
+const projects = (await getCollection('projects'))
+  .map((entry) => entry.data)
+  .sort((a, b) => a.order - b.order);
+
+const payload = JSON.stringify({
+  role: profile?.role ?? '',
+  bio: profile?.bio ?? '',
+  skills: profile?.skills ?? {},
+  projects: projects.map((project) => ({
+    name: project.name,
+    description: project.description,
+    url: project.link,
+  })),
+});
+---
+
+<div
+  id="portfolio-terminal"
+  data-payload={payload}
+  class="fixed inset-0 z-[100] hidden bg-black/80 p-3 sm:p-8"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="terminal-title"
+  aria-hidden="true"
+>
+  <div class="mx-auto flex h-[min(85vh,760px)] max-w-4xl flex-col overflow-hidden rounded-lg border border-ide-border bg-bg-dark shadow-2xl">
+    <header class="flex items-center justify-between gap-3 border-b border-ide-border bg-ide-gray px-4 py-3">
+      <div class="flex min-w-0 items-center gap-2">
+        <span class="size-3 rounded-full bg-[#ff5f56]"></span>
+        <span class="size-3 rounded-full bg-[#ffbd2e]"></span>
+        <span class="size-3 rounded-full bg-[#27c93f]"></span>
+        <span id="terminal-title" class="ml-3 truncate font-mono text-xs">
+          Portfolio Console
+        </span>
+      </div>
+
+      <button
+        id="terminal-close"
+        type="button"
+        class="rounded border border-ide-border px-3 py-1 text-xs font-mono hover:border-primary"
+      >
+        Close
+      </button>
+    </header>
+
+    <div class="flex flex-1 min-h-0 flex-col p-4 font-mono text-sm">
+      <div class="mb-3 flex flex-wrap items-center gap-2 border-b border-ide-border pb-3">
+        <span class="text-xs text-gray-400">Try:</span>
+
+        {['help', 'projects', 'pipeline', 'upstream', 'verify'].map((command) => (
+          <button
+            type="button"
+            data-console-command={command}
+            class="rounded border border-ide-border px-2 py-1 text-xs text-primary hover:border-primary"
+          >
+            {command}
+          </button>
+        ))}
+      </div>
+
+      <div
+        id="terminal-output"
+        role="log"
+        aria-live="polite"
+        class="min-h-0 flex-1 space-y-2 overflow-y-auto text-gray-300"
+      >
+        <p class="text-accent-green">Portfolio Console</p>
+        <p class="text-gray-400">
+          Explore projects, deployment steps and upstream work. Type help for commands.
+        </p>
+      </div>
+
+      <form id="terminal-form" class="mt-3 flex items-center gap-2 border-t border-ide-border pt-3">
+        <label for="terminal-input" class="shrink-0 text-accent-green">
+          visitor@portfolio:~$
+        </label>
+
+        <input
+          id="terminal-input"
+          type="text"
+          aria-label="Console command"
+          autocomplete="off"
+          autocapitalize="off"
+          spellcheck="false"
+          class="min-w-0 flex-1 bg-transparent text-foreground outline-none"
+        />
+      </form>
+
+      <p class="mt-2 text-[11px] text-gray-400">Tab: complete · ↑/↓: history · Esc: close</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  type Project = {
+    name: string;
+    description: string;
+    url: string;
+  };
+
+  type Data = {
+    role: string;
+    bio: string;
+    skills: Record<string, string[]>;
+    projects: Project[];
+  };
+
+  const modal = document.querySelector<HTMLElement>('#portfolio-terminal');
+  const input = document.querySelector<HTMLInputElement>('#terminal-input');
+  const form = document.querySelector<HTMLFormElement>('#terminal-form');
+  const output = document.querySelector<HTMLElement>('#terminal-output');
+
+  if (modal && input && form && output) {
+    const data = JSON.parse(modal.dataset.payload ?? '{}') as Data;
+
+    const commands = [
+      'help',
+      'about',
+      'whoami',
+      'stack',
+      'projects',
+      'pipeline',
+      'upstream',
+      'verify',
+      'links',
+      'open arm',
+      'open mokerlink',
+      'open goodtop',
+      'cat about.md',
+      'cat skills.json',
+      'cat projects.md',
+      'git status',
+      'git log',
+      'kubectl get pods',
+      'docker ps',
+      'ls',
+      'pwd',
+      'date',
+      'history',
+      'clear',
+      'exit',
+    ];
+
+    const history: string[] = [];
+    let historyIndex = 0;
+    let previousFocus: HTMLElement | null = null;
+    let previousOverflow = '';
+
+    const projectLink = 'https://github.com/ctalaveraw/arm-homelab-platform';
+
+    const evidenceLink = `${projectLink}/blob/main/docs/interview/engineering-evidence.md`;
+
+    function write(message: string, className = 'text-gray-300') {
+      const element = document.createElement('div');
+      element.className = `whitespace-pre-wrap break-words ${className}`;
+      element.textContent = message;
+      output!.appendChild(element);
+      output!.scrollTop = output!.scrollHeight;
+    }
+
+    function link(label: string, url: string) {
+      if (!url.startsWith('https://github.com/')) return;
+
+      const anchor = document.createElement('a');
+      anchor.textContent = label;
+      anchor.href = url;
+      anchor.target = '_blank';
+      anchor.rel = 'noopener noreferrer';
+      anchor.className = 'block break-words text-primary underline';
+
+      output!.appendChild(anchor);
+      output!.scrollTop = output!.scrollHeight;
+    }
+
+    function getProject(keyword: string) {
+      return data.projects.find((project) => project.name.toLowerCase().includes(keyword));
+    }
+
+    function showProject(project?: Project) {
+      if (!project) {
+        write('Project not found.');
+        return;
+      }
+
+      write(project.name, 'text-accent-green');
+      write(project.description);
+      link('View source and details', project.url);
+    }
+
+    function execute(raw: string) {
+      const command = raw.trim().toLowerCase();
+
+      if (!command) return;
+
+      if (command === 'clear') {
+        output!.replaceChildren();
+        return;
+      }
+
+      if (command === 'exit') {
+        close();
+        return;
+      }
+
+      write(`visitor@portfolio:~$ ${raw}`, 'text-primary');
+
+      switch (command) {
+        case 'help':
+          write(
+            [
+              'about       Background and engineering interests',
+              'stack       Tools and technologies',
+              'projects    Browse published projects',
+              'pipeline    Follow the ARM64 delivery path',
+              'upstream    Merged OpenWrt contributions',
+              'verify      Test and architecture references',
+              'links       GitHub profile and site source',
+              'open arm    Open the ARM64 platform repository',
+              'open mokerlink / open goodtop',
+              'git status  GitHub repository link',
+              'kubectl get pods  Cluster information',
+              'history     Previous commands',
+              'clear       Clear output',
+              'exit        Close console',
+            ].join('\n'),
+          );
+          break;
+
+        case 'about':
+        case 'whoami':
+        case 'cat about.md':
+          write(data.role, 'text-accent-green');
+          write(data.bio);
+          break;
+
+        case 'stack':
+        case 'cat skills.json':
+          write(JSON.stringify(data.skills, null, 2));
+          break;
+
+        case 'projects':
+        case 'cat projects.md':
+          data.projects.forEach(showProject);
+          break;
+
+        case 'pipeline':
+          write(
+            [
+              'ARM64 delivery path',
+              '',
+              'GitHub source',
+              '  |',
+              '  v',
+              'ARM64 CI: validate / build / test / scan',
+              '  |',
+              '  v',
+              'OCI image published by digest',
+              '  |',
+              '  +--> Gitea OCI mirror',
+              '  |',
+              '  v',
+              'Flux reconciliation',
+              '  |',
+              '  v',
+              'Raspberry Pi Kubernetes cluster',
+              '',
+              'Rollback and drift correction were tested.',
+              'Full recovery and alerting remain in progress.',
+            ].join('\n'),
+          );
+          link('Architecture and source', projectLink);
+          break;
+
+        case 'upstream':
+          write('Merged OpenWrt board-support contributions:');
+          link('MokerLink 2G080GM — PR #25193', 'https://github.com/openwrt/openwrt/pull/25193');
+          link('GoodTop GT-SWTXG8FM — PR #25391', 'https://github.com/openwrt/openwrt/pull/25391');
+          break;
+
+        case 'verify':
+          write('Platform test records and implementation details:');
+          link('Engineering evidence', evidenceLink);
+          link('Architecture', `${projectLink}/blob/main/docs/architecture/overview.md`);
+          link('Roadmap and outstanding work', `${projectLink}/blob/main/docs/roadmap.md`);
+          break;
+
+        case 'links':
+          link('GitHub profile', 'https://github.com/ctalaveraw');
+          link('Portfolio source', 'https://github.com/ctalaveraw/ctalaveraw.github.io');
+          break;
+
+        case 'open arm':
+          showProject(getProject('arm64'));
+          break;
+
+        case 'open mokerlink':
+          showProject(getProject('mokerlink'));
+          break;
+
+        case 'open goodtop':
+          showProject(getProject('goodtop'));
+          break;
+
+        case 'git status':
+        case 'git log':
+          write('Repository information is available on GitHub.');
+          link('View portfolio repository', 'https://github.com/ctalaveraw/ctalaveraw.github.io');
+          break;
+
+        case 'kubectl get pods':
+          write('No cluster connection is configured for this site.');
+          link('See the Kubernetes platform project', projectLink);
+          break;
+
+        case 'docker ps':
+          write('No container runtime is connected to this page.');
+          link('View the deployment project', projectLink);
+          break;
+
+        case 'ls':
+          write('about.md  skills.json  projects.md  pipeline  upstream');
+          break;
+
+        case 'pwd':
+          write('/portfolio');
+          break;
+
+        case 'date':
+          write(new Date().toString());
+          break;
+
+        case 'history':
+          history.forEach((entry, index) => write(`${index + 1}  ${entry}`));
+          break;
+
+        default:
+          if (command.startsWith('echo ')) {
+            write(raw.slice(5));
+          } else {
+            write(`Command not found: ${raw}`);
+            write('Type help to see available commands.');
+          }
+      }
+
+      output!.scrollTop = output!.scrollHeight;
+    }
+
+    function submit(raw: string) {
+      const command = raw.trim();
+      if (!command) return;
+
+      history.push(command);
+      historyIndex = history.length;
+      execute(command);
+      input!.focus();
+    }
+
+    function open() {
+      if (!modal!.classList.contains('hidden')) return;
+
+      previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+
+      previousOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+
+      modal!.classList.remove('hidden');
+      modal!.setAttribute('aria-hidden', 'false');
+      input!.focus();
+    }
+
+    function close() {
+      modal!.classList.add('hidden');
+      modal!.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = previousOverflow;
+      previousFocus?.focus();
+    }
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const command = input!.value;
+      input!.value = '';
+      submit(command);
+    });
+
+    input.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        historyIndex = Math.max(0, historyIndex - 1);
+        input!.value = history[historyIndex] ?? '';
+      }
+
+      if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        historyIndex = Math.min(history.length, historyIndex + 1);
+        input!.value = history[historyIndex] ?? '';
+      }
+
+      if (event.key === 'Tab' && input!.value.trim()) {
+        const prefix = input!.value.trim().toLowerCase();
+        const matches = commands.filter((c) => c.startsWith(prefix));
+
+        if (matches.length) {
+          event.preventDefault();
+
+          if (matches.length === 1) {
+            input!.value = matches[0];
+          } else {
+            write(matches.join('  '), 'text-gray-400');
+          }
+        }
+      }
+    });
+
+    document.querySelectorAll<HTMLButtonElement>('[data-console-command]').forEach((button) => {
+      button.addEventListener('click', () => {
+        submit(button.dataset.consoleCommand ?? '');
+      });
+    });
+
+    ['open-portfolio-terminal', 'open-portfolio-terminal-hero'].forEach((id) => {
+      document.getElementById(id)?.addEventListener('click', open);
+    });
+
+    document.getElementById('terminal-close')?.addEventListener('click', close);
+
+    modal.addEventListener('click', (event) => {
+      if (event.target === modal) close();
+    });
+
+    document.addEventListener('keydown', (event) => {
+      const target = event.target;
+      const editing =
+        target instanceof HTMLElement &&
+        (['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName) || target.isContentEditable);
+
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault();
+        if (modal!.classList.contains('hidden')) open();
+        else close();
+      }
+
+      if (!editing && (event.key === '`' || event.key === '~')) {
+        event.preventDefault();
+        if (modal!.classList.contains('hidden')) open();
+        else close();
+      }
+
+      if (event.key === 'Escape' && !modal!.classList.contains('hidden')) {
+        event.preventDefault();
+        close();
+      }
+    });
+
+    modal.addEventListener('keydown', (event) => {
+      if (event.key !== 'Tab') return;
+
+      const focusable = Array.from(
+        modal!.querySelectorAll<HTMLElement>('button:not([disabled]), input, a[href]'),
+      );
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last?.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first?.focus();
+      }
+    });
+  }
+</script>

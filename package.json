@@ -1,0 +1,31 @@
+{
+  "name": "ctalaveraw-portfolio",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "check": "astro check",
+    "lint": "eslint --ext .astro,.ts,.js,.mjs src scripts astro.config.mjs eslint.config.mjs",
+    "format": "prettier --write \"src/**/*.{astro,ts,js,css,md}\" \"scripts/**/*.mjs\" \"docs/**/*.md\" README.md package.json tsconfig.json astro.config.mjs compose.yaml \".github/workflows/*.yml\"",
+    "format:check": "prettier --check \"src/**/*.{astro,ts,js,css,md}\" \"scripts/**/*.mjs\" \"docs/**/*.md\" README.md package.json tsconfig.json astro.config.mjs compose.yaml \".github/workflows/*.yml\"",
+    "test:output": "node scripts/check-build.mjs",
+    "verify": "bash scripts/verify.sh"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.2.0",
+    "astro": "7.4.5",
+    "tailwindcss": "^4.2.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "0.9.12",
+    "eslint": "10.14.0",
+    "eslint-plugin-astro": "3.2.1",
+    "prettier": "3.9.10",
+    "prettier-plugin-astro": "1.1.2",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.72.1"
+  }
+}

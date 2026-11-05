@@ -1,0 +1,17 @@
+services:
+  portfolio:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    working_dir: /workspace
+    user: '${RUN_AS:?Set RUN_AS before using Compose}'
+    environment:
+      HOME: /tmp
+      npm_config_cache: /tmp/npm-cache
+      ASTRO_TELEMETRY_DISABLED: '1'
+    volumes:
+      - .:/workspace
+    ports:
+      - '127.0.0.1:4321:4321'
+    command: >
+      sh -ec "npm ci && exec ./node_modules/.bin/astro dev --host 0.0.0.0 --ignore-lock"
