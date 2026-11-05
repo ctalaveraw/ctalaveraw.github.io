@@ -1,0 +1,313 @@
+---
+const presets = [
+  ['hophni', 'HoPHNi', '#00e5ff', '#00ff00', '#0d1117'],
+  ['github', 'GitHub', '#58a6ff', '#3fb950', '#0d1117'],
+  ['catppuccin', 'Catppuccin', '#cba6f7', '#a6e3a1', '#1e1e2e'],
+  ['nord', 'Nord', '#88c0d0', '#a3be8c', '#2e3440'],
+  ['gruvbox', 'Gruvbox', '#fabd2f', '#b8bb26', '#282828'],
+  ['dracula', 'Dracula', '#bd93f9', '#50fa7b', '#282a36'],
+  ['tokyo-night', 'Tokyo Night', '#7aa2f7', '#9ece6a', '#1a1b26'],
+  ['one-dark', 'One Dark', '#61afef', '#98c379', '#282c34'],
+  ['solarized-dark', 'Solarized', '#268bd2', '#859900', '#002b36'],
+  ['rose-pine', 'Rosé Pine', '#c4a7e7', '#9ccfd8', '#191724'],
+  ['everforest', 'Everforest', '#a7c080', '#83c092', '#2d353b'],
+  ['monokai', 'Monokai', '#ffd866', '#a9dc76', '#2d2a2e'],
+  ['ayu-mirage', 'Ayu Mirage', '#ffcc66', '#bae67e', '#1f2430'],
+];
+
+const colors = [
+  ['Background', '--color-bg-dark'],
+  ['Panels', '--color-ide-gray'],
+  ['Borders', '--color-ide-border'],
+  ['Status bar', '--color-ide-status'],
+  ['Primary accent', '--color-primary'],
+  ['Secondary accent', '--color-accent-green'],
+  ['Foreground', '--color-foreground'],
+  ['Keywords', '--color-syntax-keyword'],
+  ['Strings', '--color-syntax-string'],
+  ['Comments', '--color-syntax-comment'],
+];
+---
+
+<div id="theme-controls" class="relative flex items-center gap-2 font-mono">
+  <button
+    id="theme-preset-toggle"
+    type="button"
+    aria-label="Choose color theme"
+    aria-controls="theme-preset-panel"
+    aria-expanded="false"
+    title="Choose color theme"
+    class="rounded-full p-1 border border-ide-border hover:border-primary cursor-pointer"
+  >
+    <span
+      id="theme-indicator"
+      class="block size-6 rounded-full"
+      style="background: conic-gradient(#58a6ff 0 42%, #3fb950 42% 68%, #0d1117 68% 100%)"
+    ></span>
+  </button>
+
+  <button
+    id="theme-edit-toggle"
+    type="button"
+    aria-controls="theme-editor-panel"
+    aria-expanded="false"
+    class="text-xs px-2 py-1 border border-ide-border rounded hover:text-primary cursor-pointer"
+  >
+    Edit colors
+  </button>
+
+  <div
+    id="theme-preset-panel"
+    hidden
+    class="absolute right-0 top-full mt-2 z-[80] w-[min(360px,calc(100vw-1rem))] max-h-[75vh] overflow-y-auto rounded-lg border border-ide-border bg-ide-gray p-4 shadow-2xl"
+  >
+    <h2 class="text-sm font-semibold mb-3">Color themes</h2>
+
+    <div class="grid grid-cols-4 gap-3">
+      {presets.map(([id, name, primary, secondary, background]) => (
+        <button
+          type="button"
+          data-theme-preset={id}
+          aria-label={`Use ${name} theme`}
+          aria-pressed="false"
+          class="flex flex-col items-center gap-1 rounded-md p-1 cursor-pointer hover:bg-white/5"
+        >
+          <span
+            class="block size-10 rounded-full border border-ide-border"
+            style={`background: conic-gradient(${primary} 0 42%, ${secondary} 42% 68%, ${background} 68% 100%)`}
+          ></span>
+          <span class="text-[10px] leading-tight text-center">{name}</span>
+        </button>
+      ))}
+    </div>
+
+    <button
+      id="theme-custom-shortcut"
+      type="button"
+      class="mt-4 w-full border border-ide-border rounded py-2 text-xs hover:border-primary cursor-pointer"
+    >
+      Create custom palette
+    </button>
+  </div>
+
+  <div
+    id="theme-editor-panel"
+    hidden
+    class="absolute right-0 top-full mt-2 z-[80] w-72 max-w-[90vw] max-h-[75vh] overflow-y-auto rounded-lg border border-ide-border bg-ide-gray p-4 shadow-2xl"
+  >
+    <h2 class="text-sm font-semibold mb-3">Custom palette</h2>
+
+    <div class="space-y-2">
+      {colors.map(([label, token]) => (
+        <label class="flex items-center justify-between gap-3 text-xs">
+          <span>{label}</span>
+          <input
+            type="color"
+            data-color-token={token}
+            aria-label={label}
+            value="#000000"
+            class="size-8 cursor-pointer"
+          />
+        </label>
+      ))}
+    </div>
+
+    <button
+      id="theme-reset"
+      type="button"
+      class="mt-4 text-xs text-primary underline cursor-pointer"
+    >
+      Reset to GitHub Dark
+    </button>
+  </div>
+</div>
+
+<script>
+  const root = document.documentElement;
+
+  const controls = document.getElementById('theme-controls');
+  const presetToggle = document.getElementById('theme-preset-toggle');
+  const editorToggle = document.getElementById('theme-edit-toggle');
+  const presetPanel = document.getElementById('theme-preset-panel');
+  const editorPanel = document.getElementById('theme-editor-panel');
+  const indicator = document.getElementById('theme-indicator');
+
+  const choices = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-theme-preset]'));
+
+  const inputs = Array.from(document.querySelectorAll<HTMLInputElement>('[data-color-token]'));
+
+  const tokens = inputs.map((input) => input.dataset.colorToken!);
+
+  const themeKey = 'portfolio-theme';
+  const colorsKey = 'portfolio-custom-colors';
+  const hex = /^#[0-9a-f]{6}$/i;
+
+  function readColors(): Record<string, string> {
+    const style = getComputedStyle(root);
+    const result: Record<string, string> = {};
+
+    for (const token of tokens) {
+      const value = style.getPropertyValue(token).trim();
+      result[token] = hex.test(value) ? value : '#000000';
+    }
+
+    return result;
+  }
+
+  function loadCustom(): Record<string, string> | null {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(colorsKey) ?? 'null');
+
+      if (!parsed || typeof parsed !== 'object') return null;
+
+      const result: Record<string, string> = {};
+
+      for (const token of tokens) {
+        if (typeof parsed[token] !== 'string' || !hex.test(parsed[token])) {
+          return null;
+        }
+        result[token] = parsed[token];
+      }
+
+      return result;
+    } catch {
+      return null;
+    }
+  }
+
+  function saveTheme(name: string) {
+    try {
+      localStorage.setItem(themeKey, name);
+    } catch {
+      // Local storage is optional.
+    }
+  }
+
+  function updateDisplay() {
+    const current = root.dataset.theme ?? 'github';
+
+    for (const choice of choices) {
+      const active = choice.dataset.themePreset === current;
+      choice.setAttribute('aria-pressed', String(active));
+      choice.classList.toggle('outline', active);
+      choice.classList.toggle('outline-2', active);
+      choice.classList.toggle('outline-primary', active);
+    }
+
+    const colors = readColors();
+
+    if (indicator) {
+      indicator.style.background = `conic-gradient(
+        ${colors['--color-primary']} 0 42%,
+        ${colors['--color-accent-green']} 42% 68%,
+        ${colors['--color-bg-dark']} 68% 100%
+      )`;
+    }
+
+    for (const input of inputs) {
+      input.value = colors[input.dataset.colorToken!];
+    }
+  }
+
+  function applyPreset(name: string) {
+    if (!choices.some((choice) => choice.dataset.themePreset === name)) {
+      return;
+    }
+
+    for (const token of tokens) {
+      root.style.removeProperty(token);
+    }
+
+    root.dataset.theme = name;
+    saveTheme(name);
+    updateDisplay();
+  }
+
+  function applyCustom(colors: Record<string, string>) {
+    root.dataset.theme = 'custom';
+
+    for (const token of tokens) {
+      if (hex.test(colors[token] ?? '')) {
+        root.style.setProperty(token, colors[token]);
+      }
+    }
+
+    try {
+      localStorage.setItem(themeKey, 'custom');
+      localStorage.setItem(colorsKey, JSON.stringify(colors));
+    } catch {
+      // Theme works without persistence.
+    }
+
+    updateDisplay();
+  }
+
+  function openPanel(which: 'preset' | 'editor' | null) {
+    if (presetPanel) presetPanel.hidden = which !== 'preset';
+    if (editorPanel) editorPanel.hidden = which !== 'editor';
+
+    presetToggle?.setAttribute('aria-expanded', String(which === 'preset'));
+
+    editorToggle?.setAttribute('aria-expanded', String(which === 'editor'));
+  }
+
+  presetToggle?.addEventListener('click', () => {
+    openPanel(presetPanel?.hidden ? 'preset' : null);
+  });
+
+  editorToggle?.addEventListener('click', () => {
+    updateDisplay();
+    openPanel(editorPanel?.hidden ? 'editor' : null);
+  });
+
+  document.getElementById('theme-custom-shortcut')?.addEventListener('click', () => {
+    updateDisplay();
+    openPanel('editor');
+    editorToggle?.focus();
+  });
+
+  choices.forEach((choice) => {
+    choice.addEventListener('click', () => {
+      applyPreset(choice.dataset.themePreset!);
+      openPanel(null);
+      presetToggle?.focus();
+    });
+  });
+
+  inputs.forEach((input) => {
+    input.addEventListener('input', () => {
+      const colors = readColors();
+      colors[input.dataset.colorToken!] = input.value;
+      applyCustom(colors);
+    });
+  });
+
+  document.getElementById('theme-reset')?.addEventListener('click', () => {
+    applyPreset('github');
+    openPanel(null);
+    presetToggle?.focus();
+  });
+
+  document.addEventListener('click', (event) => {
+    if (controls && !controls.contains(event.target as Node)) {
+      openPanel(null);
+    }
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      const hadOpenPanel = !presetPanel?.hidden || !editorPanel?.hidden;
+
+      openPanel(null);
+
+      if (hadOpenPanel) presetToggle?.focus();
+    }
+  });
+
+  if (root.dataset.theme === 'custom') {
+    const saved = loadCustom();
+    if (saved) applyCustom(saved);
+  }
+
+  updateDisplay();
+</script>

@@ -1,0 +1,49 @@
+---
+import { getCollection } from 'astro:content';
+
+const projectEntries = await getCollection('projects');
+const projects = projectEntries.map((e) => e.data).sort((a, b) => a.order - b.order);
+---
+
+<section class="space-y-8" id="projects">
+  <div class="flex items-center gap-4 animate-reveal">
+    <h2 class="text-2xl font-bold font-display">Projects.md</h2>
+    <div class="h-px flex-1 bg-ide-border"></div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {projects.map((project, idx) => (
+      <div
+        class="bg-ide-gray/40 border border-ide-border rounded-lg p-6 flex flex-col gap-4 code-glow transition-all duration-300 group animate-reveal"
+        style={`animation-delay: ${idx * 0.15}s`}
+      >
+        <div class="flex items-center justify-between">
+          <span class="material-symbols-outlined text-primary text-3xl">{project.icon}</span>
+          <div class="flex gap-3 text-gray-400 group-hover:text-primary transition-colors">
+            {project.link && (
+              <a
+                href={project.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="hover:scale-110 transition-transform"
+              >
+                <span class="material-symbols-outlined cursor-pointer">link</span>
+              </a>
+            )}
+          </div>
+        </div>
+        <div>
+          <h3 class="font-mono text-lg font-bold mb-2">{project.name}</h3>
+          <p class="text-sm text-gray-400 leading-relaxed">{project.description}</p>
+        </div>
+        <div class="mt-auto flex flex-wrap gap-2 pt-4">
+          {project.stack.map((tech) => (
+            <span class="tech-badge px-2 py-1 bg-primary/10 text-primary text-[10px] font-mono rounded border border-primary/20 hover:bg-primary/20 transition-colors">
+              {tech}
+            </span>
+          ))}
+        </div>
+      </div>
+    ))}
+  </div>
+</section>
