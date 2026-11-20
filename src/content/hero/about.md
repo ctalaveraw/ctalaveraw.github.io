@@ -21,8 +21,8 @@ aboutMore:
     I've worked on rooted OnePlus devices and spent evenings exploring
     serial consoles on network hardware. BATMAN-adv mesh experiments
     have taught me quite a bit about wireless routing. I host my own AI
-    services, and I prefer open-source software that lets me keep
-    using devices long after vendor support ends.
+    services on hardware I control. Privacy is a big reason I self-host.
+    Open-source software has also kept otherwise abandoned devices useful.
 skills:
   cloud: ['AWS', 'IAM', 'VPC', 'Lambda', 'EventBridge', 'Transfer Family', 'Snowflake']
   delivery: ['Terraform', 'Ansible', 'GitHub Actions', 'Forgejo', 'OCI', 'Flux']
