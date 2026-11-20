@@ -54,9 +54,10 @@ export const helpSections = [
 ] as const satisfies readonly HelpSection[];
 
 export function formatTerminalHelp(): string[] {
-  const width =
-    Math.max(...helpSections.flatMap((section) => section.commands.map(([command]) => command.length))) +
-    3;
+  const commandNames = helpSections.flatMap((section) =>
+    section.commands.map(([command]) => command),
+  );
+  const width = Math.max(...commandNames.map((command) => command.length)) + 3;
 
   return helpSections.flatMap((section) => [
     section.heading,
