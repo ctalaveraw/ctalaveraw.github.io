@@ -118,7 +118,12 @@ const payload = JSON.stringify({
 
   type Data = {
     role: string;
-    experiences: { company: string; role: string; period: string; description: string }[];
+    experiences: {
+      company: string;
+      role: string;
+      period: string;
+      description: string;
+    }[];
     credentials: string[];
     education: string;
     bio: string;

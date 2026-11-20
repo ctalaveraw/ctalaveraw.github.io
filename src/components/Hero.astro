@@ -28,7 +28,9 @@ const skills = profile?.skills ?? {};
       <div class="text-primary mb-2">$ cat about.md</div>
       <div class="text-gray-300 max-w-3xl leading-7 mb-7 space-y-4">
         <p>{bio}</p>
-        {aboutMore.map((paragraph) => <p>{paragraph}</p>)}
+        {aboutMore.map((paragraph) => (
+          <p>{paragraph}</p>
+        ))}
       </div>
 
       <div class="text-primary mb-3">$ cat skills.json</div>

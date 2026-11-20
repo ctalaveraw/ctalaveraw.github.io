@@ -4,7 +4,10 @@
  * The A.A.S. has met degree requirements; official conferral is pending.
  */
 export const certifications = [
-  { name: 'AWS Certified Machine Learning Engineer – Associate', detail: 'MLA-C01 · Earned Sep 2026' },
+  {
+    name: 'AWS Certified Machine Learning Engineer – Associate',
+    detail: 'MLA-C01 · Earned Sep 2026',
+  },
   { name: 'AWS Certified Solutions Architect – Associate' },
   { name: 'CompTIA Security+' },
   { name: 'AWS Certified Cloud Practitioner' },
