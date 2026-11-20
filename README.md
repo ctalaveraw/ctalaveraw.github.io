@@ -1,93 +1,89 @@
-# Engineering Portfolio
+# Infrastructure engineering portfolio
 
-Source for the personal engineering portfolio of Christian Talavera.
+**[Visit the portfolio](https://ctalaveraw.github.io/)** ·
+[GitHub profile](https://github.com/ctalaveraw) ·
+[Development guide](docs/DEVELOPMENT.md)
 
-**Planned site:** https://ctalaveraw.github.io/
-**GitHub profile:** https://github.com/ctalaveraw
+The source for Christian Talavera's static engineering portfolio. It covers Linux,
+AWS/cloud infrastructure, infrastructure automation, an ARM64 platform lab, and
+merged OpenWrt device-support contributions.
 
-## About
+## Featured work
 
-A static, interactive portfolio covering cloud infrastructure,
-platform engineering, Linux, networking, automation, and
-open-source contributions.
+- **[ARM64 platform lab](https://github.com/ctalaveraw/arm-homelab-platform)** —
+  Ansible-managed services, CI-built OCI artifacts, Raspberry Pi Kubernetes,
+  Flux, and observability. The repository includes
+  [implementation notes](https://github.com/ctalaveraw/arm-homelab-platform/blob/main/docs/interview/engineering-evidence.md),
+  [architecture](https://github.com/ctalaveraw/arm-homelab-platform/blob/main/docs/architecture/overview.md),
+  and a [roadmap](https://github.com/ctalaveraw/arm-homelab-platform/blob/main/docs/roadmap.md).
+- **[MokerLink 2G080GM](https://github.com/openwrt/openwrt/pull/25193)** —
+  Merged OpenWrt board support for an RTL9303-based 8-port 2.5GbE switch.
+- **[GoodTop GT-SWTXG8FM](https://github.com/openwrt/openwrt/pull/25391)** —
+  Merged OpenWrt board support for an RTL9303-based 8-port SFP+ switch.
 
-The focus is on engineering evidence: implemented systems,
-technical decisions, verification, failures, and recovery.
+## Site
 
-## Technical approach
+The frontend uses Astro 7, Tailwind CSS 4, and Markdown-backed content collections.
+The IDE-style navigation, theme picker, and portfolio console run in the browser.
 
-- Astro with Tailwind CSS
-- GitHub Pages for static hosting
-- GitHub Actions for validation and publication
-- Markdown-driven project and experience content
-- IDE-inspired navigation and a simulated terminal
-- Selectable color themes
+Visitors can select one of 13 color presets or customize individual colors.
+Theme preferences are stored in their browser. The console offers project,
+delivery-path, and contribution commands; **it is not a remote shell** and cannot
+query the author's infrastructure.
 
-The frontend will be adapted from the MIT-licensed HoPHNi
-portfolio template.
+GitHub Pages serves prebuilt static files. There is no application server,
+database, login, visitor tracker, or live homelab connection.
 
-## Local container configuration
+## Local development
 
-Docker Compose uses a local `.env` file for the container UID/GID.
-Generate it on a rootful Docker host with:
+Requirements: Git, Docker Engine, and Docker Compose V2. A host Node.js
+installation is not required.
 
-    printf 'RUN_AS=%s:%s\n' "$(id -u)" "$(id -g)" > .env
-    chmod 600 .env
+From the repository root, generate a local container identity on a rootful
+Docker host:
 
-See `.env.example` and `docs/DEVELOPMENT.md` for details.
+```sh
+printf 'RUN_AS=%s:%s\n' "$(id -u)" "$(id -g)" >| .env
+chmod 600 .env
+docker compose build portfolio
+docker compose up
+```
 
-## Development
+Open <http://localhost:4321/>. Stop the development server with Ctrl+C.
 
-Once the Astro source is imported, local development will use:
+Run all local checks with:
 
-    npm ci
-    npm run dev
+```sh
+docker compose run --rm --no-deps portfolio \
+  sh -ec 'npm ci && npm run verify'
+```
 
-Production validation:
+The verification runner checks ShellCheck, formatting, ESLint, Astro diagnostics,
+the production build, generated pages, and npm advisories. See
+[docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) for the full workflow, content layout,
+and troubleshooting.
 
-    npm run build
-    npm run preview
+## Publishing
 
-Generated output belongs in dist/ and is not committed.
+Changes go through pull requests against protected `main`.
 
-## Delivery
+- [Portfolio CI](.github/workflows/validate.yml) runs `npm run verify` and
+  uploads a short-lived build artifact.
+- [Publish portfolio](.github/workflows/pages.yml) builds, verifies, and deploys
+  `dist/` to GitHub Pages after a push to `main`.
+- The `verify` status check is required by the repository's `protect-main`
+  ruleset.
 
-Changes are developed on feature branches and reviewed through
-pull requests. The intended publishing path is:
+Do not commit `.env`, credentials, private infrastructure details, or
+employer/customer-confidential data.
 
-    source -> pull request -> validation -> main -> GitHub Pages
+## Attribution
 
-GitHub Pages deployment will be configured after the initial
-Astro build is validated.
+The frontend is adapted from
+[HoPHNi.dev](https://github.com/HoPHNiDev/hophni.dev), originally by
+Shohjaxon Xamrayev, under the MIT license. The imported template revision was
+`e386d16636fb19091e880d5cdd633b390848431d`.
 
-## Engineering boundaries
-
-- The terminal is a browser simulation, not a remote shell.
-- No backend or live homelab access is required.
-- Independent engineering projects are distinguished from
-  professional production experience.
-- Project claims should link to source, tests, PRs, or evidence.
-- No private infrastructure details, credentials, or employer-
-  confidential information belong in the repository.
-
-## Maintenance
-
-Project and experience content should be editable without
-changing application code. Dependencies are lockfile-managed.
-Avoid unnecessary services, dynamic data sources, and automation.
-
-## Attribution and license
-
-Frontend foundation: [HoPHNi.dev](https://github.com/HoPHNiDev/hophni.dev)
-by Shohjaxon Xamrayev, MIT licensed.
-
-Original copyright and permission notice are retained in LICENSE.
-See the source template for its original design and implementation.
-
-Later changes and site content are maintained by Christian Talavera.
-The portfolio does not claim that the original frontend was
-designed or written from scratch.
-
-## Status
-
-Repository foundation in progress. Site not yet deployed.
+The original copyright and permission notice are retained in
+[LICENSE](LICENSE). Subsequent modifications and portfolio content are
+maintained by Christian Talavera.
