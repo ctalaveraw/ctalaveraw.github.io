@@ -5,7 +5,7 @@
 [Development guide](docs/DEVELOPMENT.md)
 
 The source for Christian Talavera's static engineering portfolio. It covers Linux,
-AWS/cloud infrastructure, infrastructure automation, an ARM64 platform lab, and
+AWS infrastructure support, cloud consulting, an ARM64 platform lab, and
 merged OpenWrt device-support contributions.
 
 ## Featured work

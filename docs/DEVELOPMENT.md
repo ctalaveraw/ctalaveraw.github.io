@@ -77,7 +77,7 @@ The standard Compose service is configured for development, not preview.
 Content and application code:
 
 - `src/content.config.ts` — collection loaders and schemas
-- `src/content/hero/` — introduction and technology groups
+- `src/content/hero/` — introduction, project history, and technology groups
 - `src/content/projects/` — project cards and links
 - `src/content/experience/` — experience timeline and highlights
 - `src/content/contacts/` — contact and source links
@@ -85,6 +85,7 @@ Content and application code:
 - `src/layouts/BaseLayout.astro` — metadata and theme restoration
 - `src/components/` — navigation, cards, console, theme picker, footer
 - `src/data/platformArchitecture.ts` — documented platform paths used by the architecture view and console
+- `src/data/credentials.ts` — verified certifications and education status
 - `src/styles/` — Tailwind tokens, palettes, global styles
 
 Automation and deployment:
@@ -102,7 +103,10 @@ Markdown files in `src/content/` have YAML frontmatter validated by
 Projects and experience entries use a numeric `order` field to control
 display order. Project links must be valid URLs.
 
-The hero and project cards are loaded from these collections.
+The hero and project cards are loaded from these collections. Current AWS work and
+prior consulting appear as separately ordered experience entries. The hero
+supports extra paragraphs in its `aboutMore` list. Credential names and the
+A.A.S. conferral status are maintained in `src/data/credentials.ts`.
 The architecture view and the console's `pipeline` command share
 `src/data/platformArchitecture.ts`, which documents separate GHCR,
 Flux, and Forgejo paths, their recorded checks, and their authority boundaries.
