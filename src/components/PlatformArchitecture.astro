@@ -8,86 +8,86 @@ import {
 
 <section id="architecture" class="space-y-6" aria-labelledby="architecture-title">
   <div class="flex items-center gap-4">
-    <h2 id="architecture-title" class="text-2xl font-bold font-mono">Architecture.md</h2>
+    <h2 id="architecture-title" class="text-2xl font-bold font-mono">
+      Architecture.md
+    </h2>
     <div class="h-px flex-1 bg-ide-border"></div>
   </div>
 
   <p class="max-w-3xl text-sm leading-7 text-gray-400">
-    Four paths through the ARM64 platform, based on the public engineering documentation.
-    Select a path to examine its components and source references. This is a design
-    reference, not live infrastructure status.
+    Four paths through the ARM64 platform, based on the public engineering documentation. Select a
+    path to examine its components and source references. This is a design reference, not live
+    infrastructure status.
   </p>
 
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-    {
-      architecturePaths.map((path) => (
-        <details class="group min-w-0 rounded-lg border border-ide-border bg-ide-gray/40 code-glow">
-          <summary class="cursor-pointer list-none p-5 focus-visible:rounded-lg">
-            <div class="flex items-center justify-between gap-3">
-              <h3 class="font-mono text-base font-semibold text-foreground">{path.title}</h3>
-              <span
-                class="font-mono text-primary text-xs shrink-0 group-open:hidden"
-                aria-hidden="true"
-              >
-                + details
-              </span>
-              <span
-                class="font-mono text-primary text-xs shrink-0 hidden group-open:inline"
-                aria-hidden="true"
-              >
-                − collapse
-              </span>
-            </div>
-            <div class="mt-4 flex flex-wrap items-center gap-x-2 gap-y-3">
-              {path.nodes.map((id, index) => (
-                <>
-                  {index > 0 && (
-                    <span aria-hidden="true" class="text-accent-green font-mono">
-                      →
-                    </span>
-                  )}
-                  <span class="rounded border border-ide-border bg-bg-dark px-2.5 py-1.5 font-mono text-xs text-primary">
-                    {architectureNodes[id].title}
-                  </span>
-                </>
-              ))}
-            </div>
-          </summary>
-
-          <div class="border-t border-ide-border p-5 space-y-4">
-            <p class="text-sm leading-6 text-gray-300">{path.description}</p>
-            <ol class="space-y-3">
-              {path.nodes.map((id, index) => {
-                const node = architectureNodes[id];
-                return (
-                  <li class="flex items-start gap-3">
-                    <span
-                      aria-hidden="true"
-                      class="flex size-7 shrink-0 items-center justify-center rounded border border-ide-border text-xs font-mono text-accent-green"
-                    >
-                      {index + 1}
-                    </span>
-                    <div class="min-w-0">
-                      <h4 class="font-mono font-semibold text-sm">{node.title}</h4>
-                      <p class="text-sm text-gray-400 leading-6">{node.summary}</p>
-                      <a
-                        href={node.sourceUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="inline-block mt-1 text-sm text-primary hover:underline focus-visible:underline"
-                      >
-                        {node.sourceLabel}
-                        <span class="sr-only"> (opens in a new tab)</span>
-                      </a>
-                    </div>
-                  </li>
-                );
-              })}
-            </ol>
+    {architecturePaths.map((path) => (
+      <details class="group min-w-0 rounded-lg border border-ide-border bg-ide-gray/40 code-glow">
+        <summary class="cursor-pointer list-none p-5 focus-visible:rounded-lg">
+          <div class="flex items-center justify-between gap-3">
+            <h3 class="font-mono text-base font-semibold text-foreground">{path.title}</h3>
+            <span
+              class="font-mono text-primary text-xs shrink-0 group-open:hidden"
+              aria-hidden="true"
+            >
+              + details
+            </span>
+            <span
+              class="font-mono text-primary text-xs shrink-0 hidden group-open:inline"
+              aria-hidden="true"
+            >
+              − collapse
+            </span>
           </div>
-        </details>
-      ))
-    }
+          <div class="mt-4 flex flex-wrap items-center gap-x-2 gap-y-3">
+            {path.nodes.map((id, index) => (
+              <>
+                {index > 0 && (
+                  <span aria-hidden="true" class="text-accent-green font-mono">
+                    →
+                  </span>
+                )}
+                <span class="rounded border border-ide-border bg-bg-dark px-2.5 py-1.5 font-mono text-xs text-primary">
+                  {architectureNodes[id].title}
+                </span>
+              </>
+            ))}
+          </div>
+        </summary>
+
+        <div class="border-t border-ide-border p-5 space-y-4">
+          <p class="text-sm leading-6 text-gray-300">{path.description}</p>
+          <ol class="space-y-3">
+            {path.nodes.map((id, index) => {
+              const node = architectureNodes[id];
+              return (
+                <li class="flex items-start gap-3">
+                  <span
+                    aria-hidden="true"
+                    class="flex size-7 shrink-0 items-center justify-center rounded border border-ide-border text-xs font-mono text-accent-green"
+                  >
+                    {index + 1}
+                  </span>
+                  <div class="min-w-0">
+                    <h4 class="font-mono font-semibold text-sm">{node.title}</h4>
+                    <p class="text-sm text-gray-400 leading-6">{node.summary}</p>
+                    <a
+                      href={node.sourceUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="inline-block mt-1 text-sm text-primary hover:underline focus-visible:underline"
+                    >
+                      {node.sourceLabel}
+                      <span class="sr-only"> (opens in a new tab)</span>
+                    </a>
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
+        </div>
+      </details>
+    ))}
   </div>
 
   <p class="font-mono text-xs text-gray-400">
@@ -97,7 +97,10 @@ import {
       target="_blank"
       rel="noopener noreferrer"
       class="text-primary hover:underline"
-    >platform source documentation</a>.
+    >
+      platform source documentation
+    </a>
+    .
   </p>
 </section>
 
