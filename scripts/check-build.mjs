@@ -15,6 +15,8 @@ const required = {
   'ARM64 project present': homepage.includes('ARM64 Platform Lab'),
   'Architecture view present': homepage.includes('Architecture.md'),
   'Forgejo mirror documented': homepage.includes('Forgejo mirror'),
+  'Recorded checks shown': homepage.includes('Recorded checks'),
+  'Authority boundary shown': homepage.includes('Authority boundary'),
   'Flux source path documented': homepage.includes('Desired state'),
   'OpenWrt projects present': homepage.includes('OpenWrt'),
   'MokerLink PR linked': homepage.includes('https://github.com/openwrt/openwrt/pull/25193'),

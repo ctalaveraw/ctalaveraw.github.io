@@ -15,10 +15,34 @@ import {
   </div>
 
   <p class="max-w-3xl text-sm leading-7 text-gray-400">
-    Four paths through the ARM64 platform, based on the public engineering documentation. Select a
-    path to examine its components and source references. This is a design reference, not live
-    infrastructure status.
+    This is how changes reach the ARM64 lab. Each path shows its recorded checks and authority
+    boundary, with links to the evidence. The view is based on published notes, not live cluster data.
   </p>
+
+  <div class="rounded-lg border border-ide-border bg-bg-dark p-4 font-mono text-xs">
+    <div class="flex flex-wrap items-center justify-between gap-2 border-b border-ide-border pb-3">
+      <span class="text-primary">PLATFORM / DELIVERY BOUNDARIES</span>
+      <span class="text-gray-400">DOCUMENTED, NOT LIVE</span>
+    </div>
+    <dl class="grid grid-cols-1 gap-x-8 gap-y-3 pt-4 sm:grid-cols-2">
+      <div class="flex items-center justify-between gap-3">
+        <dt class="text-gray-400">source of truth</dt>
+        <dd class="text-foreground">GitHub main</dd>
+      </div>
+      <div class="flex items-center justify-between gap-3">
+        <dt class="text-gray-400">reconciliation</dt>
+        <dd class="text-foreground">Flux</dd>
+      </div>
+      <div class="flex items-center justify-between gap-3">
+        <dt class="text-gray-400">workload image</dt>
+        <dd class="text-foreground">GHCR by digest</dd>
+      </div>
+      <div class="flex items-center justify-between gap-3">
+        <dt class="text-gray-400">secondary registry</dt>
+        <dd class="text-foreground">Forgejo OCI</dd>
+      </div>
+    </dl>
+  </div>
 
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
     {architecturePaths.map((path) => (
@@ -39,6 +63,7 @@ import {
               − collapse
             </span>
           </div>
+          <p class="mt-2 font-mono text-xs text-accent-green">{path.gate}</p>
           <div class="mt-4 flex flex-wrap items-center gap-x-2 gap-y-3">
             {path.nodes.map((id, index) => (
               <>
@@ -57,6 +82,16 @@ import {
 
         <div class="border-t border-ide-border p-5 space-y-4">
           <p class="text-sm leading-6 text-gray-300">{path.description}</p>
+          <dl class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div class="rounded border border-ide-border bg-bg-dark p-3">
+              <dt class="font-mono text-xs text-accent-green">Recorded checks</dt>
+              <dd class="mt-2 text-sm leading-6 text-gray-300">{path.evidence}</dd>
+            </div>
+            <div class="rounded border border-ide-border bg-bg-dark p-3">
+              <dt class="font-mono text-xs text-accent-green">Authority boundary</dt>
+              <dd class="mt-2 text-sm leading-6 text-gray-300">{path.boundary}</dd>
+            </div>
+          </dl>
           <ol class="space-y-3">
             {path.nodes.map((id, index) => {
               const node = architectureNodes[id];
@@ -91,7 +126,7 @@ import {
   </div>
 
   <p class="font-mono text-xs text-gray-400">
-    Architecture and operational acceptance are tracked in the
+    The full test records and outstanding recovery work are in the
     <a
       href={architectureSourceUrl}
       target="_blank"
