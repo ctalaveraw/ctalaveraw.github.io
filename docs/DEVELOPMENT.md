@@ -74,22 +74,25 @@ The standard Compose service is configured for development, not preview.
 
 ## Repository layout
 
-| Path | Responsibility |
-| --- | --- |
-| `src/content.config.ts` | Astro schemas and Markdown collection loaders |
-| `src/content/hero/` | Introduction and technology groups |
-| `src/content/projects/` | Project cards, order, links, and tags |
-| `src/content/experience/` | Experience timeline and Markdown highlights |
-| `src/content/contacts/` | Public links in the contact section |
-| `src/pages/` | Home and 404 routes |
-| `src/layouts/BaseLayout.astro` | Page metadata, styles, and initial theme restoration |
-| `src/components/` | Navigation, cards, timeline, console, theme editor, footer |
-| `src/styles/` | Tailwind theme tokens, palette definitions, and global styles |
-| `scripts/verify.sh` | Ordered verification gates and CI summary |
-| `scripts/check-shell.sh` | Shell script discovery, Bash syntax, ShellCheck |
-| `scripts/check-build.mjs` | Assertions against built pages and links |
-| `.github/workflows/validate.yml` | PR and main-branch validation |
-| `.github/workflows/pages.yml` | Verified static build and Pages deployment |
+Content and application code:
+
+- `src/content.config.ts` — collection loaders and schemas
+- `src/content/hero/` — introduction and technology groups
+- `src/content/projects/` — project cards and links
+- `src/content/experience/` — experience timeline and highlights
+- `src/content/contacts/` — contact and source links
+- `src/pages/` — home and 404 routes
+- `src/layouts/BaseLayout.astro` — metadata and theme restoration
+- `src/components/` — navigation, cards, console, theme picker, footer
+- `src/styles/` — Tailwind tokens, palettes, global styles
+
+Automation and deployment:
+
+- `scripts/verify.sh` — ordered verification gates and CI summary
+- `scripts/check-shell.sh` — Bash syntax and ShellCheck
+- `scripts/check-build.mjs` — generated-page assertions
+- `.github/workflows/validate.yml` — pull-request and main validation
+- `.github/workflows/pages.yml` — verified GitHub Pages deployment
 
 ### Editing site content
 
