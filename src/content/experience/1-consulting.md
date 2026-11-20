@@ -5,9 +5,9 @@ period: 'Previous role'
 stack: ['AWS', 'Terraform', 'CI/CD', 'Automation']
 order: 1
 current: false
-description: 'Cloud infrastructure and delivery work in a consulting environment.'
+description: 'AWS infrastructure changes, deployment pipelines, and event-driven integrations.'
 ---
 
-- AWS infrastructure automation and operational support.
-- CI/CD pipelines, deployment troubleshooting, and infrastructure changes.
-- Work involving event-driven AWS services and data integrations.
+- Worked on AWS infrastructure and automated deployment changes in a consulting team.
+- Investigated pipeline failures and deployment problems.
+- Supported event-driven services and data integrations.

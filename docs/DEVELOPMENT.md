@@ -105,14 +105,24 @@ display order. Project links must be valid URLs.
 The hero and project cards are loaded from these collections.
 The architecture view and the console's `pipeline` command share
 `src/data/platformArchitecture.ts`, which documents separate GHCR,
-Flux, and Forgejo paths. Verify those claims against the platform's
-public architecture notes when they change. Other console commands and
+Flux, and Forgejo paths, their recorded checks, and their authority boundaries.
+Compare that data with the platform's public architecture notes when it changes. Other console commands and
 some URLs are still authored in `src/components/HiddenTerminal.astro`.
 The “Further reading” links in `src/pages/index.astro` are also explicit.
 
 The console is browser-only: it does not execute shell commands, run
-`kubectl`, call GitHub's API, or contact a real cluster. The example
-delivery path must not be presented as live status.
+`kubectl`, call GitHub's API, or contact a real cluster. The architecture
+section describes recorded checks, not current service health.
+
+### Reviewing public copy
+
+Use implementation names and observed behavior instead of claims such as
+"reliable" or "production-ready" without supporting tests. Do not imply
+that recorded telemetry proves the current monitoring stack is healthy.
+Separate completed checks from recovery work that remains open. Prose-pattern
+linters such as SlopMonster can identify formulaic phrasing, but a clean
+score does not establish factual accuracy; compare claims with upstream PRs
+and the platform evidence ledger.
 
 ### Editing themes
 

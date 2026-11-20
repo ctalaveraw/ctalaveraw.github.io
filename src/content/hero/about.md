@@ -2,7 +2,7 @@
 role: 'Cloud & Platform Infrastructure Engineer'
 username: 'chris'
 hostname: 'portfolio'
-bio: 'I work across Linux, cloud infrastructure, automation, and networking. My background includes AWS infrastructure operations and cloud/DevOps consulting. Outside work, I build an ARM64 platform lab and contribute device support to OpenWrt. I prefer small, testable changes and systems that can be understood and recovered.'
+bio: 'My background covers AWS data center operations and cloud/DevOps consulting. In my lab, I run a three-node Raspberry Pi Kubernetes cluster with Ansible, GitHub CI, and Flux. Forgejo provides a separate source mirror and validation runner. I also contributed merged OpenWrt support for two RTL9303 switches. The repositories include test records, failures, and recovery work still in progress.'
 skills:
   cloud: ['AWS', 'IAM', 'VPC', 'Lambda', 'EventBridge']
   automation: ['Terraform', 'Ansible', 'GitHub Actions', 'Git']

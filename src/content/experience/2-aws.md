@@ -5,9 +5,9 @@ period: 'Infrastructure operations experience'
 stack: ['Hardware', 'Linux', 'Networking', 'Troubleshooting']
 order: 2
 current: false
-description: 'Physical infrastructure operations, distinct from cloud-platform administration.'
+description: 'Hardware fault isolation and repair in AWS data centers.'
 ---
 
-- Diagnosis and repair of data-center infrastructure.
-- Hardware and connectivity fault isolation.
-- Operational procedures and escalation during infrastructure incidents.
+- Diagnosed server hardware and network-connectivity faults.
+- Repaired equipment and followed documented escalation procedures.
+- Worked on physical infrastructure, separate from AWS cloud administration.
