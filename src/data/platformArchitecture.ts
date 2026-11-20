@@ -89,7 +89,7 @@ export const architecturePaths: ArchitecturePath[] = [
   {
     id: 'image',
     title: 'Application image',
-    description: 'GitHub CI builds, tests, and scans the ARM64 image. Kubernetes references its published GHCR digest.'
+    description: 'GitHub CI builds, tests, and scans the ARM64 image. Kubernetes references its published GHCR digest.',
     gate: 'BUILD / TEST / SCAN',
     evidence: 'Image archive, checksum, image ID, and full registry retrieval were checked.',
     boundary: 'CI publishes the image; Flux owns workload changes.',
@@ -98,7 +98,7 @@ export const architecturePaths: ArchitecturePath[] = [
   {
     id: 'gitops',
     title: 'Desired state',
-    description: 'Flux reads the application manifests from GitHub and reconciles the cluster.'
+    description: 'Flux reads the application manifests from GitHub and reconciles the cluster.',
     gate: 'RECONCILE / TEST DRIFT',
     evidence: 'Reconciliation, rollback, and drift correction have recorded tests.',
     boundary: 'Forgejo is not the Flux source of truth.',
@@ -107,7 +107,7 @@ export const architecturePaths: ArchitecturePath[] = [
   {
     id: 'validation',
     title: 'Independent validation',
-    description: 'Forgejo mirrors GitHub and runs a separate repository-scoped CI runner.'
+    description: 'Forgejo mirrors GitHub and runs a separate repository-scoped CI runner.',
     gate: 'MIRROR / VALIDATE',
     evidence: 'Manual runs and mirrored-push validation passed after migration.',
     boundary: 'The runner has no Kubernetes authority or production Docker socket.',
@@ -116,7 +116,7 @@ export const architecturePaths: ArchitecturePath[] = [
   {
     id: 'distribution',
     title: 'OCI distribution copy',
-    description: 'Skopeo copies the built image from GHCR into the Forgejo OCI registry.'
+    description: 'Skopeo copies the built image from GHCR into the Forgejo OCI registry.',
     gate: 'COPY / VERIFY DIGEST',
     evidence: 'Digest parity and full OCI retrieval were verified after migration.',
     boundary: 'The Kubernetes workload continues to pull from GHCR.',
