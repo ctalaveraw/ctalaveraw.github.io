@@ -2,6 +2,7 @@
 company: 'Amazon Web Services'
 role: 'Infrastructure Support Engineer'
 period: 'Feb 2026 – Present'
+workType: 'Infrastructure operations, storage, and automation'
 stack: ['Data center operations', 'Archival storage', 'Linux', 'Troubleshooting', 'Automation']
 order: 1
 current: true

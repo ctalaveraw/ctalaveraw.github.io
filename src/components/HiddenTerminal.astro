@@ -18,11 +18,15 @@ const payload = JSON.stringify({
   experiences: experiences.map((entry) => ({
     company: entry.company,
     role: entry.role,
-    period: entry.period,
+    workType: entry.workType,
     description: entry.description ?? '',
   })),
   credentials: certifications,
-  education: `${education.program} · ${education.institution} · ${education.status}`,
+  education: education.map((entry) => ({
+    degree: entry.degree,
+    institution: entry.institution,
+    status: entry.status,
+  })),
   bio: profile?.bio ?? '',
   aboutMore: profile?.aboutMore ?? [],
   skills: profile?.skills ?? {},
@@ -124,11 +128,11 @@ const payload = JSON.stringify({
     experiences: {
       company: string;
       role: string;
-      period: string;
+      workType: string;
       description: string;
     }[];
     credentials: string[];
-    education: string;
+    education: { degree: string; institution: string; status: string }[];
     bio: string;
     aboutMore: string[];
     skills: Record<string, string[]>;
@@ -245,7 +249,7 @@ const payload = JSON.stringify({
               'PROFILE',
               '  about           background and current work',
               '  stack           systems and tooling',
-              '  experience      employment history',
+              '  experience      work areas and responsibilities',
               '  credentials     certifications and education',
               '  projects        project summaries',
               '',
@@ -286,8 +290,9 @@ const payload = JSON.stringify({
 
         case 'experience':
           data.experiences.forEach((entry) => {
-            write(`${entry.role} · ${entry.company}`, 'text-accent-green');
-            write(`${entry.period} | ${entry.description}`);
+            write(entry.workType, 'text-accent-green');
+            write(`  ${entry.role} · ${entry.company}`);
+            write(`  ${entry.description}`);
           });
           break;
 
@@ -295,7 +300,10 @@ const payload = JSON.stringify({
           write('CERTIFICATIONS', 'text-accent-green');
           data.credentials.forEach((credential) => write(`  ${credential}`));
           write('EDUCATION', 'text-accent-green');
-          write(data.education);
+          data.education.forEach((entry) => {
+            write(`  ${entry.degree} · ${entry.institution}`);
+            write(`  ${entry.status}`);
+          });
           break;
 
         case 'projects':

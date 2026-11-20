@@ -106,7 +106,9 @@ display order. Project links must be valid URLs.
 The hero and project cards are loaded from these collections. Current AWS work and
 prior consulting appear as separately ordered experience entries. The hero
 supports extra paragraphs in its `aboutMore` list. Credential names and the
-A.A.S. conferral status are maintained in `src/data/credentials.ts`.
+degree statuses are maintained in `src/data/credentials.ts`. Experience entries
+retain dates in their source frontmatter for recordkeeping; the visible page
+and console emphasize `workType` and responsibilities.
 The architecture view and the console's `pipeline` command share
 `src/data/platformArchitecture.ts`, which documents separate GHCR,
 Flux, and Forgejo paths, their recorded checks, and their authority boundaries.

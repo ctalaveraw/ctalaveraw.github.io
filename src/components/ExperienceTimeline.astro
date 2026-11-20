@@ -29,11 +29,15 @@ const rendered = await Promise.all(
         ></div>
 
         <div
-          class={`p-6 bg-ide-gray/40 rounded-lg border border-ide-border code-glow transition-all duration-300 ${!data.current ? 'opacity-80 hover:opacity-100' : ''}`}
+          class={`p-6 bg-ide-gray/40 rounded-lg border border-ide-border code-glow transition-all duration-300 ${data.current ? 'border-primary/40' : ''}`}
         >
-          {/* Comment header */}
-          <div class="text-syntax-comment mb-2">
-            // {data.current ? 'Current Role' : data.period}
+          <div class="mb-4 flex flex-wrap items-center gap-3">
+            <span class="font-mono text-sm font-semibold text-accent-green">{data.workType}</span>
+            {data.current && (
+              <span class="rounded border border-primary/30 bg-primary/10 px-2 py-0.5 text-xs text-primary">
+                Current
+              </span>
+            )}
           </div>
 
           <div class="space-y-1">
@@ -47,12 +51,12 @@ const rendered = await Promise.all(
               <span class="text-syntax-string">{data.role}</span>",
             </div>
             <div class="pl-4">
-              "<span class="text-primary">period</span>": "
-              <span class="text-syntax-string">{data.period}</span>",
+              "<span class="text-primary">work_type</span>": "
+              <span class="text-syntax-string">{data.workType}</span>",
             </div>
             {data.description && (
               <div class="pl-4">
-                "<span class="text-primary">project</span>": "
+                "<span class="text-primary">scope</span>": "
                 <span class="text-syntax-string">{data.description}</span>",
               </div>
             )}
@@ -69,7 +73,7 @@ const rendered = await Promise.all(
               ],
             </div>
             <div class="pl-4">
-              "<span class="text-primary">highlights</span>": [
+              "<span class="text-primary">responsibilities</span>": [
             </div>
 
             {/* Render markdown content as code comments */}

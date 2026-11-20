@@ -2,6 +2,7 @@
 company: 'SingleStone'
 role: 'Associate Consultant – Cloud / DevOps'
 period: 'Jan 2022 – Mar 2024'
+workType: 'Cloud engineering and DevOps delivery'
 stack: ['AWS', 'Terraform', 'CI/CD', 'Data integrations']
 order: 2
 current: false

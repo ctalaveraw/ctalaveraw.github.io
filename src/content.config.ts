@@ -38,6 +38,7 @@ const experience = defineCollection({
     company: z.string(),
     role: z.string(),
     period: z.string(),
+    workType: z.string(),
     stack: z.array(z.string()),
     order: z.number(),
     current: z.boolean().default(false),
