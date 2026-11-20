@@ -84,6 +84,7 @@ Content and application code:
 - `src/pages/` — home and 404 routes
 - `src/layouts/BaseLayout.astro` — metadata and theme restoration
 - `src/components/` — navigation, cards, console, theme picker, footer
+- `src/data/platformArchitecture.ts` — documented platform paths used by the architecture view and console
 - `src/styles/` — Tailwind tokens, palettes, global styles
 
 Automation and deployment:
@@ -102,11 +103,12 @@ Projects and experience entries use a numeric `order` field to control
 display order. Project links must be valid URLs.
 
 The hero and project cards are loaded from these collections.
-The console reads profile, skills, and project data at build time, but
-**some commands and URLs are authored directly** in
-`src/components/HiddenTerminal.astro`. The “Further reading” links in
-`src/pages/index.astro` are also explicit. Review those locations when
-updating the ARM64 platform architecture or moving evidence files.
+The architecture view and the console's `pipeline` command share
+`src/data/platformArchitecture.ts`, which documents separate GHCR,
+Flux, and Forgejo paths. Verify those claims against the platform's
+public architecture notes when they change. Other console commands and
+some URLs are still authored in `src/components/HiddenTerminal.astro`.
+The “Further reading” links in `src/pages/index.astro` are also explicit.
 
 The console is browser-only: it does not execute shell commands, run
 `kubectl`, call GitHub's API, or contact a real cluster. The example
@@ -185,6 +187,10 @@ These checks are manual in the current repository.
 
 The repository uses feature branches and a protected `main`. The
 `protect-main` ruleset requires a pull request and the `verify` check.
+
+Both workflows use `actions/checkout@v7`, whose JavaScript action runtime is
+Node.js 24. That runtime is separate from the Node.js 22 container used to
+build and validate the site.
 
 **Portfolio CI** (`.github/workflows/validate.yml`) runs on pull requests
 and pushes to `main`. It creates the local `.env` from the runner's UID/GID,
