@@ -198,8 +198,9 @@ These checks are manual in the current repository.
 The repository uses feature branches and a protected `main`. The
 `protect-main` ruleset requires a pull request and the `verify` check.
 
-Both workflows use `actions/checkout@v7`, whose JavaScript action runtime is
-Node.js 24. That runtime is separate from the Node.js 22 container used to
+Both workflows use Node.js 24-based GitHub Actions: `checkout@v7`,
+`upload-artifact@v7`, `upload-pages-artifact@v5`, and `deploy-pages@v5`.
+The action runtime is separate from the Node.js 22 container used to
 build and validate the site.
 
 **Portfolio CI** (`.github/workflows/validate.yml`) runs on pull requests
