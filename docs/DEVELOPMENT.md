@@ -1,319 +1,290 @@
-# Development
+# Development and operations
 
-This repository contains an Astro static site deployed through GitHub Pages.
+This guide describes how to develop, verify, and publish
+[ctalaveraw.github.io](https://ctalaveraw.github.io/). The repository builds
+a static Astro site: GitHub Pages serves the output, and no server process
+runs for site visitors.
 
-Local development uses Docker Compose and a pinned Node.js image. Node.js
-does not need to be installed on the host.
+For an overview of the projects on the site, see the [README](../README.md).
 
-The website does not require a backend.
+## Requirements and toolchain
 
-## Prerequisites
+Local development uses **Git, Docker Engine, and Docker Compose V2**. The
+container supplies Node.js, npm, and ShellCheck; no host Node installation is
+needed.
 
-- Git
-- Docker Engine
-- Docker Compose V2
+- `Dockerfile.dev` extends a digest-pinned Node.js 22 Bookworm Slim image
+  with ShellCheck from Debian packages.
+- `compose.yaml` bind-mounts the repository at `/workspace`, runs processes
+  as the configured user, and binds the development server to
+  `127.0.0.1:4321` on the host.
+- `package-lock.json` fixes the npm dependency tree for `npm ci`.
+- `dist/`, `.astro/`, `node_modules/`, and `.env` are ignored by Git.
+- `.dockerignore` limits the development image build context to the
+  Dockerfile; source files enter the container through the Compose volume.
 
-The container image is specified in `compose.yaml`. Dependencies are
-resolved from `package-lock.json`.
+The Docker image is a **development/build environment**, not the production
+hosting runtime. Its ShellCheck package is installed when the image is built,
+so rebuilding it can update that package independently of the pinned Node
+base image.
 
-## Local development
+### Configure the local user
 
-From the repository root, set the container user.
+The Compose service requires `RUN_AS` in `UID:GID` form. This avoids
+creating root-owned files in the bind-mounted working tree on a rootful
+Docker host.
 
-For rootful Docker:
+From the repository root:
 
-    export RUN_AS="$(id -u):$(id -g)"
+```sh
+printf 'RUN_AS=%s:%s\n' "$(id -u)" "$(id -g)" >| .env
+chmod 600 .env
+docker compose config --quiet
+```
 
-For rootless Docker, the current configuration uses:
+Compose loads `.env` automatically from the project directory.
+`.env.example` documents the setting; its numeric value is a placeholder,
+**not** a portable default. Regenerate `.env` when working under a different
+host account or on another machine. Never commit it.
 
-    export RUN_AS="0:0"
+These instructions are validated for rootful Docker. Rootless Docker has
+different UID mappings; do not assume that the same `RUN_AS` value works
+there. Verify the effective container identity and write permissions
+before using the project with a rootless daemon.
 
-Check the configuration:
+## Start and stop the site
 
-    docker compose config --quiet
+```sh
+docker compose build portfolio
+docker compose up
+```
 
-Install dependencies:
+Browse to <http://localhost:4321/>. The service runs `npm ci` before
+starting Astro; `npm ci` also runs explicitly as part of verification.
 
-    docker compose run --rm --no-deps portfolio npm ci
+Stop with Ctrl+C. For a detached service, use `docker compose down`.
 
-Start the development server:
+The Compose command executes the Astro CLI directly and passes
+`--ignore-lock`. This avoids stale Astro development-server lock records
+on a bind-mounted checkout and lets Compose control the process lifecycle.
 
-    docker compose up
+To preview the generated site without the Compose development command,
+run `npm run preview` in a Node environment after `npm run build`.
+The standard Compose service is configured for development, not preview.
 
-Open http://localhost:4321/.
+## Repository layout
 
-Stop the server with Ctrl+C.
+| Path | Responsibility |
+| --- | --- |
+| `src/content.config.ts` | Astro schemas and Markdown collection loaders |
+| `src/content/hero/` | Introduction and technology groups |
+| `src/content/projects/` | Project cards, order, links, and tags |
+| `src/content/experience/` | Experience timeline and Markdown highlights |
+| `src/content/contacts/` | Public links in the contact section |
+| `src/pages/` | Home and 404 routes |
+| `src/layouts/BaseLayout.astro` | Page metadata, styles, and initial theme restoration |
+| `src/components/` | Navigation, cards, timeline, console, theme editor, footer |
+| `src/styles/` | Tailwind theme tokens, palette definitions, and global styles |
+| `scripts/verify.sh` | Ordered verification gates and CI summary |
+| `scripts/check-shell.sh` | Shell script discovery, Bash syntax, ShellCheck |
+| `scripts/check-build.mjs` | Assertions against built pages and links |
+| `.github/workflows/validate.yml` | PR and main-branch validation |
+| `.github/workflows/pages.yml` | Verified static build and Pages deployment |
 
-## Build and validation
+### Editing site content
 
-Build the static site:
+Markdown files in `src/content/` have YAML frontmatter validated by
+`src/content.config.ts`. Add or modify a file in the appropriate collection.
+Projects and experience entries use a numeric `order` field to control
+display order. Project links must be valid URLs.
 
-    docker compose run --rm --no-deps portfolio npm run build
+The hero and project cards are loaded from these collections.
+The console reads profile, skills, and project data at build time, but
+**some commands and URLs are authored directly** in
+`src/components/HiddenTerminal.astro`. The “Further reading” links in
+`src/pages/index.astro` are also explicit. Review those locations when
+updating the ARM64 platform architecture or moving evidence files.
 
-Expected output:
+The console is browser-only: it does not execute shell commands, run
+`kubectl`, call GitHub's API, or contact a real cluster. The example
+delivery path must not be presented as live status.
 
-- `dist/index.html`
-- `dist/404.html`
+### Editing themes
 
-Check npm dependencies:
+`src/styles/themes.css` contains 13 named presets.
+`src/components/ThemePicker.astro` implements the picker and editor.
+`src/layouts/BaseLayout.astro` restores saved preferences on page load.
 
-    docker compose run --rm --no-deps portfolio \
-      npm audit --audit-level=high
-
-Check the lockfile-based installation and build together:
-
-    docker compose run --rm --no-deps portfolio \
-      sh -ec 'npm ci && npm run build && npm audit --audit-level=high'
-
-The generated `dist/` directory is excluded from Git.
+Preferences use browser `localStorage` keys `portfolio-theme` and
+`portfolio-custom-colors`. Custom values are limited to the defined CSS
+color tokens. Changes are local to a visitor's browser; the site does not
+store or synchronize them remotely.
 
 ## Verification
 
-Run the full local verification:
+Build the development image after changes to `Dockerfile.dev`, then run
+the full verification sequence:
 
-    docker compose run --rm --no-deps portfolio \
-      sh -ec 'npm ci && npm run verify'
+```sh
+docker compose build portfolio
+docker compose run --rm --no-deps portfolio \
+  sh -ec 'npm ci && npm run verify'
+```
 
-The runner is `scripts/verify.sh`.
+`scripts/verify.sh` runs these gates in order:
 
-It checks formatting, ESLint rules, Astro diagnostics, the
-production build, generated output, and npm advisories.
+1. Bash syntax and ShellCheck for `scripts/**/*.sh`
+2. Prettier formatting
+3. ESLint
+4. Astro diagnostics (`astro check`)
+5. Astro static production build (`dist/`)
+6. Static output assertions (`scripts/check-build.mjs`)
+7. npm advisory audit (`npm audit --audit-level=high`)
 
-The generated-site assertions are maintained in
-`scripts/check-build.mjs`.
+The runner stops at the first failure and writes a summary to
+`GITHUB_STEP_SUMMARY` when run in GitHub Actions. Output tests cover
+the homepage, 404 page, favicon, project links, and selected template
+content that must not reappear. **They do not replace browser or
+accessibility testing.**
 
-GitHub Actions runs the same verification on pull requests
-and pushes to main. Successful PR checks also publish a
-short-lived build artifact for inspection.
+Apply formatting deliberately:
 
-Use `npm run format` to apply formatting changes. Review the
-diff before committing.
+```sh
+docker compose run --rm --no-deps portfolio npm run format
+git diff --check
+git diff
+```
 
-Browser behavior, keyboard interaction, mobile layout, and
-external link availability still require separate validation.
+The audit fails on high and critical findings. Moderate findings are
+reported but do not fail this gate. To assess only production npm
+dependencies:
 
-## Dependency updates
+```sh
+docker compose run --rm --no-deps portfolio \
+  npm audit --omit=dev --audit-level=moderate
+```
 
-Make dependency changes deliberately and commit the resulting
-`package.json` and `package-lock.json` together.
+An npm audit covers the lockfile's npm packages, not OS packages in the
+development container, CDN-hosted fonts, or browser behavior. Do not
+describe a passing high-severity audit as zero vulnerabilities unless the
+complete audit output actually shows zero.
 
-After updating dependencies, run the clean installation, build, and
-audit checks above.
+### Browser review before a release
 
-Avoid `npm audit fix --force` without reviewing the breaking changes.
+Check the built or public site on desktop and a narrow viewport. Exercise
+the IDE navigation, close/restore tabs, all public links, color presets,
+custom colors across a refresh, and the console through its button and
+keyboard shortcuts (Ctrl/Cmd+K, backtick, Escape, history, completion).
+Also inspect keyboard focus, text contrast, and reduced-motion behavior.
+These checks are manual in the current repository.
 
-The npm audit covers the resolved npm dependency tree. It is not a
-container image scan or a security assessment of the deployed website.
+## Pull requests and publishing
 
-## Setup history
+The repository uses feature branches and a protected `main`. The
+`protect-main` ruleset requires a pull request and the `verify` check.
 
-Recorded November 3, 2026.
+**Portfolio CI** (`.github/workflows/validate.yml`) runs on pull requests
+and pushes to `main`. It creates the local `.env` from the runner's UID/GID,
+builds the development image, runs `npm ci && npm run verify` in Compose,
+and uploads `dist/` as a short-lived build artifact.
 
-### Repository setup
+**Publish portfolio** (`.github/workflows/pages.yml`) runs after a push
+to `main`. Its build job executes the same verification first. If that
+passes, it uploads `dist/` with the Pages artifact action; a separate
+deployment job publishes it using the `github-pages` environment and
+`pages: write` / `id-token: write` permissions.
 
-- Initialized `ctalaveraw/ctalaveraw.github.io`.
-- Added README, MIT license and Git exclusions through PR #2.
-- Confirmed the `protect-main` ruleset requires pull requests.
-- Opened Issue #3 for the Astro portfolio implementation.
+Pages must be configured to use **GitHub Actions** as the build source.
+Keep deployment environment restrictions on `main`. No production
+server credentials are needed to publish the site.
 
-### Template import
+After merging, check both workflows in the
+[Actions tab](https://github.com/ctalaveraw/ctalaveraw.github.io/actions)
+and verify <https://ctalaveraw.github.io/> in a browser. A successful
+build job without a successful deploy job does not prove publication.
+The GitHub profile links to this public URL.
 
-Frontend source:
+## Dependency maintenance
 
-https://github.com/HoPHNiDev/hophni.dev
+For planned updates, work on a feature branch and use the development
+container. Edit `package.json` using npm commands, commit the matching
+`package-lock.json`, and rerun the full verification sequence.
 
-Original author: Shohjaxon Xamrayev.
-License: MIT.
-Imported upstream revision:
+Dependabot dependency PRs must also pass `verify`. The audit database can
+change even without a source change, so an unrelated-looking build failure
+may be an advisory update. Inspect `npm audit` and distinguish development
+dependencies from production dependencies before choosing a remedy.
 
-    e386d16636fb19091e880d5cdd633b390848431d
-
-The original license and attribution must be retained. Original
-personal details, domain configuration and unrelated artwork must
-be removed before publication.
-
-### Node.js compatibility
-
-The initial build failed with host Node.js 18.19.1 because it did
-not meet the imported Astro version's runtime requirements.
-
-A Node.js 22 container was used instead.
-
-Verified container runtime:
-
-- Node.js 22.23.4
-- npm 10.9.9
-
-The original Astro 5 site built successfully in that environment.
-
-### Docker Compose
-
-Docker Engine 29.1.3 was installed without Compose V2.
-
-The first attempt installed the legacy Python `docker-compose`
-package (1.29.2). The correct Ubuntu package,
-`docker-compose-v2`, was then installed.
-
-Verified version: Docker Compose V2 2.40.3.
-
-The legacy package was subsequently removed.
-
-The Compose configuration specifies a container UID/GID to avoid
-unintended root-owned files in the working tree.
-
-### Local Docker identity
-
-The Compose service uses RUN_AS to avoid root-owned build artifacts
-in the working tree.
-
-On the current rootful Docker host, `.env` contains the local UID/GID:
-
-    RUN_AS=<host UID>:<host GID>
-
-Generate or refresh it with:
-
-    printf 'RUN_AS=%s:%s\n' "$(id -u)" "$(id -g)" > .env
-    chmod 600 .env
-
-The `.env` file is Git-ignored and must not be committed.
-
-Regenerate it when moving the repository to a different machine
-or changing Docker's user namespace configuration.
-
-### Astro migration
-
-The imported template used Astro 5.
-
-The site was upgraded to Astro 7.4.5. Content collections were
-migrated from `src/content/config.ts` to
-`src/content.config.ts`, using Astro's loader-based API.
-
-The updated site passed a production build.
-
-The canonical site URL was changed to:
-
-https://ctalaveraw.github.io/
-
-The original custom-domain CNAME was removed.
-
-### Dependency audit
-
-The imported dependency tree initially reported:
-
-| Stage                 | Findings                       |
-| --------------------- | ------------------------------ |
-| Original template     | 17: 1 critical, 15 high, 1 low |
-| After Astro 7 upgrade | 2 high                         |
-| After `npm audit fix` | 0                              |
-
-The two remaining findings after the Astro upgrade concerned
-Rollup and Vite. Compatible dependency fixes were available.
-
-The final clean `npm ci`, Astro build and npm audit all passed.
-
-These results describe the dependency versions installed at that
-checkpoint. They are not a guarantee about future advisories.
+Avoid `npm audit fix --force` without reviewing the proposed major-version
+changes and retesting Astro, linting, and deployment. Do not suppress an
+audit gate solely to get Pages green.
 
 ## Troubleshooting
 
-### Astro reports an existing development server after restart
+### Compose reports RUN_AS is missing
 
-Astro 7 stores development-server state in `.astro/dev.json`.
-With a bind-mounted working tree, this file can survive container
-recreation and contain a stale process ID.
+Create or refresh `.env` using the command in
+[Configure the local user](#configure-the-local-user), then run
+`docker compose config --quiet`.
 
-The first development server started successfully, but later
-starts failed because Astro reported an existing server.
+### Files become owned by root
 
-The immediate fix was to stop the Compose service and remove
-the generated lock file.
+Check `RUN_AS` and container identity before changing ownership.
+For rootful Docker, the UID/GID should match the host account. Avoid
+recursive `chown` as a first response.
 
-The Compose development command now uses `--ignore-lock`.
-Docker Compose manages the service lifecycle, so the additional
-Astro process lock is unnecessary for this setup.
+### Compose warns that Buildx is missing
 
-Do not use Astro's `--force` or `stop` commands to clear an
-unverified stale PID. A documented Astro 7 issue can cause
-these commands to signal an unrelated process.
+Compose can fall back to a builder, depending on the local Docker setup.
+Check whether `docker compose build portfolio` actually completed.
+A warning alone is not a build failure.
 
-Reference:
-https://github.com/withastro/astro/issues/18343
+### Astro reports an existing development server
 
-### Compose command not found
+First stop the Compose service:
 
-Verify `docker compose version`. Ubuntu 24.04 provides the
-`docker-compose-v2` package.
+```sh
+docker compose down
+```
 
-The legacy `docker-compose` command is not interchangeable with
-the V2 plugin for this project.
+The dev command already includes `--ignore-lock`. If an old lock file
+must be cleared, inspect and remove `.astro/dev.json` only after the
+service is stopped. Do not signal an unverified PID.
 
-### RUN_AS is missing
+### Shutdown logs show SIGTERM as an npm error
 
-Set `RUN_AS` in the current terminal before running Compose.
+The earlier Compose command launched the dev server via `npm run dev`.
+The current command uses `exec ./node_modules/.bin/astro` directly,
+so npm no longer sits between the container and the dev-server process.
 
-### Permission errors
+### Verification fails at the dependency audit
 
-Check file ownership and the configured container UID/GID.
-Do not use recursive ownership changes as a default workaround.
+Read the advisory names and affected dependency paths. A clean
+production build can still fail the audit gate. Re-run the audit on the
+same lockfile, compare with `--omit=dev`, and remediate on a branch.
+Do not treat the failed Pages job as a rendering error.
 
-### Build fails after a dependency update
+### GitHub Pages did not update
 
-Inspect the dependency diff and lockfile, then rerun:
+Inspect the latest **Publish portfolio** run. Verify that the build,
+Pages artifact upload, and deploy jobs succeeded. Check the Pages
+source configuration and the deployment environment. The site uses
+the root-domain URL in `astro.config.mjs`, not a repository subpath.
 
-    npm ci
-    npm run build
-    npm audit --audit-level=high
+## Boundaries and attribution
 
-Run those commands in the configured container.
+Publish only information intended to be public. Do not commit private
+addresses, infrastructure endpoints, credentials, or employer/customer
+material. The portfolio content distinguishes professional production
+work from independent lab work.
 
-### Development server shutdown
+The frontend was adapted from
+[HoPHNi.dev](https://github.com/HoPHNiDev/hophni.dev), by
+Shohjaxon Xamrayev, under the MIT license. The imported revision was
+`e386d16636fb19091e880d5cdd633b390848431d`. Preserve the
+original notice in [LICENSE](../LICENSE) and the attribution in the
+README and site footer.
 
-The original Compose command launched Astro through npm.
-
-When Compose stopped the container, npm reported SIGTERM as a
-failed command and the container exited with status 1.
-
-The development command now executes the Astro CLI directly
-after dependency installation. This gives Astro direct signal
-handling without the additional npm process.
-
-Compose is responsible for starting and stopping the server.
-
-## Release checks
-
-Before the first deployment:
-
-- Remove original template personal information and unused assets.
-- Review public project descriptions and source links.
-- Test all themes, the terminal and mobile layout.
-- Check keyboard navigation and reduced-motion behavior.
-- Pass a clean build and dependency audit.
-- Verify license attribution.
-- Add pull-request CI and GitHub Pages deployment.
-- Check the published website before linking it from the GitHub profile.
-
-The publication pipeline and browser checks are not yet complete.
-
-## Shell script validation
-
-The development container is built from `Dockerfile.dev`.
-It extends the pinned Node.js 22 image with ShellCheck.
-
-Shell validation is implemented in `scripts/check-shell.sh`.
-It discovers `.sh` files under `scripts/` and runs:
-
-- `bash -n` for syntax validation
-- ShellCheck, including style-level diagnostics
-
-The main verification runner calls this script before the
-application checks.
-
-Local development and GitHub Actions build the same development
-image and invoke `npm run verify`.
-
-Rebuild the development image after changing `Dockerfile.dev`:
-
-    docker compose build portfolio
-
-The development image is not published or used to host the site.
-GitHub Pages serves the generated static files.
+The site loads fonts from Google-hosted stylesheets; it does not need
+a backend. If offline operation or external-request minimization
+becomes a requirement, revisit those font dependencies.
