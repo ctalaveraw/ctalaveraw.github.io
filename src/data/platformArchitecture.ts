@@ -25,7 +25,8 @@ export const architectureNodes = {
   },
   build: {
     title: 'GitHub ARM64 CI',
-    summary: 'Builds and tests platform-hello, scans it with Trivy, and verifies artifacts before publication.',
+    summary:
+      'Builds and tests platform-hello, scans it with Trivy, and verifies artifacts before publication.',
     sourceLabel: 'Engineering evidence',
     sourceUrl: evidence,
   },
@@ -89,7 +90,8 @@ export const architecturePaths: ArchitecturePath[] = [
   {
     id: 'image',
     title: 'Application image',
-    description: 'GitHub CI builds, tests, and scans the ARM64 image. Kubernetes references its published GHCR digest.',
+    description:
+      'GitHub CI builds, tests, and scans the ARM64 image. Kubernetes references its published GHCR digest.',
     gate: 'BUILD / TEST / SCAN',
     evidence: 'Image archive, checksum, image ID, and full registry retrieval were checked.',
     boundary: 'CI publishes the image; Flux owns workload changes.',
