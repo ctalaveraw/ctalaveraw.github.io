@@ -1,7 +1,13 @@
 ---
 import { getCollection } from 'astro:content';
+import { architectureConsoleLines, architectureSourceUrl } from '../data/platformArchitecture';
+import { certifications, education } from '../data/credentials';
 
 const profile = (await getCollection('hero'))[0]?.data;
+
+const experiences = (await getCollection('experience'))
+  .map((entry) => entry.data)
+  .sort((a, b) => a.order - b.order);
 
 const projects = (await getCollection('projects'))
   .map((entry) => entry.data)
@@ -9,8 +15,19 @@ const projects = (await getCollection('projects'))
 
 const payload = JSON.stringify({
   role: profile?.role ?? '',
+  experiences: experiences.map((entry) => ({
+    company: entry.company,
+    role: entry.role,
+    period: entry.period,
+    description: entry.description ?? '',
+  })),
+  credentials: certifications,
+  education: `${education.program} · ${education.institution} · ${education.status}`,
   bio: profile?.bio ?? '',
+  aboutMore: profile?.aboutMore ?? [],
   skills: profile?.skills ?? {},
+  pipeline: architectureConsoleLines(),
+  architectureSource: architectureSourceUrl,
   projects: projects.map((project) => ({
     name: project.name,
     description: project.description,
@@ -30,13 +47,12 @@ const payload = JSON.stringify({
 >
   <div class="mx-auto flex h-[min(85vh,760px)] max-w-4xl flex-col overflow-hidden rounded-lg border border-ide-border bg-bg-dark shadow-2xl">
     <header class="flex items-center justify-between gap-3 border-b border-ide-border bg-ide-gray px-4 py-3">
-      <div class="flex min-w-0 items-center gap-2">
-        <span class="size-3 rounded-full bg-[#ff5f56]"></span>
-        <span class="size-3 rounded-full bg-[#ffbd2e]"></span>
-        <span class="size-3 rounded-full bg-[#27c93f]"></span>
-        <span id="terminal-title" class="ml-3 truncate font-mono text-xs">
-          Portfolio Console
+      <div class="flex min-w-0 items-center gap-3 font-mono text-xs">
+        <span class="rounded-sm bg-primary px-2 py-1 font-semibold text-bg-dark">0:zsh</span>
+        <span id="terminal-title" class="truncate">
+          visitor@portfolio:~/console
         </span>
+        <span class="hidden text-gray-400 sm:inline">[public]</span>
       </div>
 
       <button
@@ -105,8 +121,19 @@ const payload = JSON.stringify({
 
   type Data = {
     role: string;
+    experiences: {
+      company: string;
+      role: string;
+      period: string;
+      description: string;
+    }[];
+    credentials: string[];
+    education: string;
     bio: string;
+    aboutMore: string[];
     skills: Record<string, string[]>;
+    pipeline: string[];
+    architectureSource: string;
     projects: Project[];
   };
 
@@ -124,6 +151,8 @@ const payload = JSON.stringify({
       'whoami',
       'stack',
       'projects',
+      'experience',
+      'credentials',
       'pipeline',
       'upstream',
       'verify',
@@ -213,21 +242,32 @@ const payload = JSON.stringify({
         case 'help':
           write(
             [
-              'about       Background and engineering interests',
-              'stack       Tools and technologies',
-              'projects    Browse published projects',
-              'pipeline    Follow the ARM64 delivery path',
-              'upstream    Merged OpenWrt contributions',
-              'verify      Test and architecture references',
-              'links       GitHub profile and site source',
-              'open arm    Open the ARM64 platform repository',
-              'open mokerlink / open goodtop',
-              'git status  GitHub repository link',
-              'kubectl get pods  Cluster information',
-              'history     Previous commands',
-              'clear       Clear output',
-              'exit        Close console',
+              'PROFILE',
+              '  about           background and current work',
+              '  stack           systems and tooling',
+              '  experience      employment history',
+              '  credentials     certifications and education',
+              '  projects        project summaries',
+              '',
+              'ENGINEERING EVIDENCE',
+              '  pipeline        delivery paths and authority boundaries',
+              '  upstream        merged OpenWrt contributions',
+              '  verify          test records and open recovery work',
+              '  links           profile and source',
+              '',
+              'REPOSITORIES',
+              '  open arm        ARM64 platform source',
+              '  open mokerlink  RTL9303 board support',
+              '  open goodtop    SFP+ switch board support',
+              '  git status      portfolio repository',
+              '  kubectl get pods  cluster reference',
+              '',
+              'SESSION',
+              '  history         prior commands',
+              '  clear           clear output',
+              '  exit            close console',
             ].join('\n'),
+            'text-gray-300 leading-5',
           );
           break;
 
@@ -236,11 +276,26 @@ const payload = JSON.stringify({
         case 'cat about.md':
           write(data.role, 'text-accent-green');
           write(data.bio);
+          data.aboutMore.forEach((paragraph) => write(paragraph));
           break;
 
         case 'stack':
         case 'cat skills.json':
           write(JSON.stringify(data.skills, null, 2));
+          break;
+
+        case 'experience':
+          data.experiences.forEach((entry) => {
+            write(`${entry.role} · ${entry.company}`, 'text-accent-green');
+            write(`${entry.period} | ${entry.description}`);
+          });
+          break;
+
+        case 'credentials':
+          write('CERTIFICATIONS', 'text-accent-green');
+          data.credentials.forEach((credential) => write(`  ${credential}`));
+          write('EDUCATION', 'text-accent-green');
+          write(data.education);
           break;
 
         case 'projects':
@@ -249,31 +304,8 @@ const payload = JSON.stringify({
           break;
 
         case 'pipeline':
-          write(
-            [
-              'ARM64 delivery path',
-              '',
-              'GitHub source',
-              '  |',
-              '  v',
-              'ARM64 CI: validate / build / test / scan',
-              '  |',
-              '  v',
-              'OCI image published by digest',
-              '  |',
-              '  +--> Gitea OCI mirror',
-              '  |',
-              '  v',
-              'Flux reconciliation',
-              '  |',
-              '  v',
-              'Raspberry Pi Kubernetes cluster',
-              '',
-              'Rollback and drift correction were tested.',
-              'Full recovery and alerting remain in progress.',
-            ].join('\n'),
-          );
-          link('Architecture and source', projectLink);
+          write(data.pipeline.join('\n'));
+          link('Platform architecture and source', data.architectureSource);
           break;
 
         case 'upstream':

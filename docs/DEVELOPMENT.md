@@ -77,13 +77,15 @@ The standard Compose service is configured for development, not preview.
 Content and application code:
 
 - `src/content.config.ts` — collection loaders and schemas
-- `src/content/hero/` — introduction and technology groups
+- `src/content/hero/` — introduction, project history, and technology groups
 - `src/content/projects/` — project cards and links
 - `src/content/experience/` — experience timeline and highlights
 - `src/content/contacts/` — contact and source links
 - `src/pages/` — home and 404 routes
 - `src/layouts/BaseLayout.astro` — metadata and theme restoration
 - `src/components/` — navigation, cards, console, theme picker, footer
+- `src/data/platformArchitecture.ts` — documented platform paths used by the architecture view and console
+- `src/data/credentials.ts` — verified certifications and education status
 - `src/styles/` — Tailwind tokens, palettes, global styles
 
 Automation and deployment:
@@ -101,16 +103,30 @@ Markdown files in `src/content/` have YAML frontmatter validated by
 Projects and experience entries use a numeric `order` field to control
 display order. Project links must be valid URLs.
 
-The hero and project cards are loaded from these collections.
-The console reads profile, skills, and project data at build time, but
-**some commands and URLs are authored directly** in
-`src/components/HiddenTerminal.astro`. The “Further reading” links in
-`src/pages/index.astro` are also explicit. Review those locations when
-updating the ARM64 platform architecture or moving evidence files.
+The hero and project cards are loaded from these collections. Current AWS work and
+prior consulting appear as separately ordered experience entries. The hero
+supports extra paragraphs in its `aboutMore` list. Credential names and the
+A.A.S. conferral status are maintained in `src/data/credentials.ts`.
+The architecture view and the console's `pipeline` command share
+`src/data/platformArchitecture.ts`, which documents separate GHCR,
+Flux, and Forgejo paths, their recorded checks, and their authority boundaries.
+Compare that data with the platform's public architecture notes when it changes. Other console commands and
+some URLs are still authored in `src/components/HiddenTerminal.astro`.
+The “Further reading” links in `src/pages/index.astro` are also explicit.
 
 The console is browser-only: it does not execute shell commands, run
-`kubectl`, call GitHub's API, or contact a real cluster. The example
-delivery path must not be presented as live status.
+`kubectl`, call GitHub's API, or contact a real cluster. The architecture
+section describes recorded checks, not current service health.
+
+### Reviewing public copy
+
+Use implementation names and observed behavior instead of claims such as
+"reliable" or "production-ready" without supporting tests. Do not imply
+that recorded telemetry proves the current monitoring stack is healthy.
+Separate completed checks from recovery work that remains open. Prose-pattern
+linters such as SlopMonster can identify formulaic phrasing, but a clean
+score does not establish factual accuracy; compare claims with upstream PRs
+and the platform evidence ledger.
 
 ### Editing themes
 
@@ -185,6 +201,11 @@ These checks are manual in the current repository.
 
 The repository uses feature branches and a protected `main`. The
 `protect-main` ruleset requires a pull request and the `verify` check.
+
+Both workflows use Node.js 24-based GitHub Actions: `checkout@v7`,
+`upload-artifact@v7`, `upload-pages-artifact@v5`, and `deploy-pages@v5`.
+The action runtime is separate from the Node.js 22 container used to
+build and validate the site.
 
 **Portfolio CI** (`.github/workflows/validate.yml`) runs on pull requests
 and pushes to `main`. It creates the local `.env` from the runner's UID/GID,

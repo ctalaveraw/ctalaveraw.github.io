@@ -5,14 +5,14 @@
 [Development guide](docs/DEVELOPMENT.md)
 
 The source for Christian Talavera's static engineering portfolio. It covers Linux,
-AWS/cloud infrastructure, infrastructure automation, an ARM64 platform lab, and
+AWS infrastructure support, cloud consulting, an ARM64 platform lab, and
 merged OpenWrt device-support contributions.
 
 ## Featured work
 
 - **[ARM64 platform lab](https://github.com/ctalaveraw/arm-homelab-platform)** —
-  Ansible-managed services, CI-built OCI artifacts, Raspberry Pi Kubernetes,
-  Flux, and observability. The repository includes
+  Three-node Raspberry Pi Kubernetes, GitHub-to-GHCR image delivery, Flux,
+  and a separate Forgejo mirror and validation runner. The repository includes
   [implementation notes](https://github.com/ctalaveraw/arm-homelab-platform/blob/main/docs/interview/engineering-evidence.md),
   [architecture](https://github.com/ctalaveraw/arm-homelab-platform/blob/main/docs/architecture/overview.md),
   and a [roadmap](https://github.com/ctalaveraw/arm-homelab-platform/blob/main/docs/roadmap.md).
@@ -24,12 +24,12 @@ merged OpenWrt device-support contributions.
 ## Site
 
 The frontend uses Astro 7, Tailwind CSS 4, and Markdown-backed content collections.
-The IDE-style navigation, theme picker, and portfolio console run in the browser.
+The IDE-style navigation, theme picker, architecture view, and portfolio console run in the browser.
 
 Visitors can select one of 13 color presets or customize individual colors.
-Theme preferences are stored in their browser. The console offers project,
-delivery-path, and contribution commands; **it is not a remote shell** and cannot
-query the author's infrastructure.
+Theme preferences are stored in their browser. The console offers project, delivery-path, and contribution commands. The
+architecture view separates GHCR image delivery, Flux reconciliation, Forgejo
+validation, and OCI mirroring. Neither feature queries live infrastructure.
 
 GitHub Pages serves prebuilt static files. There is no application server,
 database, login, visitor tracker, or live homelab connection.

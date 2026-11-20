@@ -15,6 +15,7 @@ const hero = defineCollection({
     username: z.string(),
     hostname: z.string(),
     bio: z.string(),
+    aboutMore: z.array(z.string()).default([]),
     skills: z.record(z.string(), z.array(z.string())),
   }),
 });

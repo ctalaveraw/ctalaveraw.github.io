@@ -4,7 +4,9 @@ import ThemePicker from './ThemePicker.astro';
 const navTabs = [
   { label: 'about.py', href: '#about', icon: 'py', color: 'text-primary' },
   { label: 'projects.md', href: '#projects', icon: 'M↓', color: 'text-blue-400' },
+  { label: 'architecture.md', href: '#architecture', icon: '◇', color: 'text-accent-green' },
   { label: 'experience.json', href: '#experience', icon: '{ }', color: 'text-yellow-400' },
+  { label: 'credentials.md', href: '#credentials', icon: '✓', color: 'text-accent-green' },
   { label: 'contact.sh', href: '#contact', icon: 'sh', color: 'text-accent-green' },
 ];
 ---
@@ -84,7 +86,7 @@ const navTabs = [
 
 <script>
   const allTabs = document.querySelectorAll('[data-tab]');
-  const sections = ['about', 'projects', 'experience', 'contact'];
+  const sections = ['about', 'projects', 'architecture', 'experience', 'credentials', 'contact'];
   const restoreBtn = document.getElementById('restore-tabs-btn');
   const closedTabs: string[] = [];
 

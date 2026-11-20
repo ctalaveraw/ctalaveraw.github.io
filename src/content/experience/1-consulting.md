@@ -1,13 +1,13 @@
 ---
 company: 'SingleStone'
-role: 'DevOps / Cloud Engineer'
-period: 'Previous role'
-stack: ['AWS', 'Terraform', 'CI/CD', 'Automation']
-order: 1
+role: 'Associate Consultant – Cloud / DevOps'
+period: 'Jan 2022 – Mar 2024'
+stack: ['AWS', 'Terraform', 'CI/CD', 'Data integrations']
+order: 2
 current: false
-description: 'Cloud infrastructure and delivery work in a consulting environment.'
+description: 'AWS infrastructure, deployment pipelines, and event-driven services for consulting engagements.'
 ---
 
-- AWS infrastructure automation and operational support.
-- CI/CD pipelines, deployment troubleshooting, and infrastructure changes.
-- Work involving event-driven AWS services and data integrations.
+- Worked on AWS infrastructure changes, automation, and delivery workflows.
+- Investigated deployment and CI/CD failures.
+- Supported event-driven integrations and data ingestion systems.
