@@ -21,9 +21,10 @@ const payload = JSON.stringify({
     period: entry.period,
     description: entry.description ?? '',
   })),
-  credentials: certifications.map((entry) => entry.name),
+  credentials: certifications,
   education: `${education.program} · ${education.institution} · ${education.status}`,
   bio: profile?.bio ?? '',
+  aboutMore: profile?.aboutMore ?? [],
   skills: profile?.skills ?? {},
   pipeline: architectureConsoleLines(),
   architectureSource: architectureSourceUrl,
@@ -127,6 +128,7 @@ const payload = JSON.stringify({
     credentials: string[];
     education: string;
     bio: string;
+    aboutMore: string[];
     skills: Record<string, string[]>;
     pipeline: string[];
     architectureSource: string;
@@ -272,6 +274,7 @@ const payload = JSON.stringify({
         case 'cat about.md':
           write(data.role, 'text-accent-green');
           write(data.bio);
+          data.aboutMore.forEach((paragraph) => write(paragraph));
           break;
 
         case 'stack':
