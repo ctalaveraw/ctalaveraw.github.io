@@ -1,13 +1,13 @@
 ---
 company: 'Amazon Web Services'
-role: 'Data Center Infrastructure Operations'
-period: 'Infrastructure operations experience'
-stack: ['Hardware', 'Linux', 'Networking', 'Troubleshooting']
-order: 2
-current: false
-description: 'Hardware fault isolation and repair in AWS data centers.'
+role: 'Infrastructure Support Engineer'
+period: 'Feb 2026 – Present'
+stack: ['Data center operations', 'Archival storage', 'Linux', 'Troubleshooting', 'Automation']
+order: 1
+current: true
+description: 'Senior operations technician with multi-building on-call coverage, archival-storage break/fix expertise, and DCO automation work.'
 ---
 
-- Diagnosed server hardware and network-connectivity faults.
-- Repaired equipment and followed documented escalation procedures.
-- Worked on physical infrastructure, separate from AWS cloud administration.
+- Provide on-call infrastructure support for several data center buildings as the senior operations technician on my team.
+- Serve as a subject matter expert for archival-storage hardware break/fix and fault isolation.
+- Automate recurring DCO workflows and contribute to infrastructure improvement projects.
