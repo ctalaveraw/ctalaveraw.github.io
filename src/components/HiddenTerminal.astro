@@ -1,5 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
+import { architectureConsoleLines, architectureSourceUrl } from '../data/platformArchitecture';
 
 const profile = (await getCollection('hero'))[0]?.data;
 
@@ -11,6 +12,8 @@ const payload = JSON.stringify({
   role: profile?.role ?? '',
   bio: profile?.bio ?? '',
   skills: profile?.skills ?? {},
+  pipeline: architectureConsoleLines(),
+  architectureSource: architectureSourceUrl,
   projects: projects.map((project) => ({
     name: project.name,
     description: project.description,
@@ -107,6 +110,8 @@ const payload = JSON.stringify({
     role: string;
     bio: string;
     skills: Record<string, string[]>;
+    pipeline: string[];
+    architectureSource: string;
     projects: Project[];
   };
 
@@ -249,31 +254,8 @@ const payload = JSON.stringify({
           break;
 
         case 'pipeline':
-          write(
-            [
-              'ARM64 delivery path',
-              '',
-              'GitHub source',
-              '  |',
-              '  v',
-              'ARM64 CI: validate / build / test / scan',
-              '  |',
-              '  v',
-              'OCI image published by digest',
-              '  |',
-              '  +--> Gitea OCI mirror',
-              '  |',
-              '  v',
-              'Flux reconciliation',
-              '  |',
-              '  v',
-              'Raspberry Pi Kubernetes cluster',
-              '',
-              'Rollback and drift correction were tested.',
-              'Full recovery and alerting remain in progress.',
-            ].join('\n'),
-          );
-          link('Architecture and source', projectLink);
+          write(data.pipeline.join('\n'));
+          link('Platform architecture and source', data.architectureSource);
           break;
 
         case 'upstream':
