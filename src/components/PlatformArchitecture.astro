@@ -15,14 +15,14 @@ import {
   </div>
 
   <p class="max-w-3xl text-sm leading-7 text-gray-400">
-    This is how changes reach the ARM64 lab. Each path shows its recorded checks and authority
-    boundary, with links to the evidence. These are published notes, not live cluster data.
+    GHCR supplies the application image, while Flux reads its manifests from GitHub. Forgejo runs
+    its own validation jobs and hosts a separate OCI copy. Expand a path for its test record.
   </p>
 
   <div class="rounded-lg border border-ide-border bg-bg-dark p-4 font-mono text-xs">
     <div class="flex flex-wrap items-center justify-between gap-2 border-b border-ide-border pb-3">
-      <span class="text-primary">PLATFORM / DELIVERY BOUNDARIES</span>
-      <span class="text-gray-400">DOCUMENTED, NOT LIVE</span>
+      <span class="text-primary">PLATFORM / DELIVERY PATHS</span>
+      <span class="text-gray-400">SOURCE: ENGINEERING NOTES</span>
     </div>
     <dl class="grid grid-cols-1 gap-x-8 gap-y-3 pt-4 sm:grid-cols-2">
       <div class="flex items-center justify-between gap-3">

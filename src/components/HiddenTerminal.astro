@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import { architectureConsoleLines, architectureSourceUrl } from '../data/platformArchitecture';
 import { certifications, education } from '../data/credentials';
+import { formatTerminalHelp } from '../data/terminalHelp';
 
 const profile = (await getCollection('hero'))[0]?.data;
 
@@ -15,6 +16,7 @@ const projects = (await getCollection('projects'))
 
 const payload = JSON.stringify({
   role: profile?.role ?? '',
+  helpLines: formatTerminalHelp(),
   experiences: experiences.map((entry) => ({
     company: entry.company,
     role: entry.role,
@@ -125,6 +127,7 @@ const payload = JSON.stringify({
 
   type Data = {
     role: string;
+    helpLines: string[];
     experiences: {
       company: string;
       role: string;
@@ -244,35 +247,7 @@ const payload = JSON.stringify({
 
       switch (command) {
         case 'help':
-          write(
-            [
-              'PROFILE',
-              '  about           background and current work',
-              '  stack           systems and tooling',
-              '  experience      work areas and responsibilities',
-              '  credentials     certifications and education',
-              '  projects        project summaries',
-              '',
-              'ENGINEERING EVIDENCE',
-              '  pipeline        delivery paths and authority boundaries',
-              '  upstream        merged OpenWrt contributions',
-              '  verify          test records and open recovery work',
-              '  links           profile and source',
-              '',
-              'REPOSITORIES',
-              '  open arm        ARM64 platform source',
-              '  open mokerlink  RTL9303 board support',
-              '  open goodtop    SFP+ switch board support',
-              '  git status      portfolio repository',
-              '  kubectl get pods  cluster reference',
-              '',
-              'SESSION',
-              '  history         prior commands',
-              '  clear           clear output',
-              '  exit            close console',
-            ].join('\n'),
-            'text-gray-300 leading-5',
-          );
+          write(data.helpLines.join('\n'), 'text-gray-300 leading-5');
           break;
 
         case 'about':

@@ -16,11 +16,11 @@ export const education = [
   {
     degree: 'A.A.S. Cybersecurity',
     institution: 'Northern Virginia Community College',
-    status: 'Conferred',
+    status: 'Degree awarded 2026',
   },
   {
     degree: 'B.S. Information Technology',
     institution: 'Western Governors University',
-    status: 'Starting December 2026',
+    status: 'Starts Dec 2026 · Expected May 2027',
   },
 ] as const;

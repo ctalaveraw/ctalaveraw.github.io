@@ -6,9 +6,8 @@ workType: 'Cloud engineering and DevOps delivery'
 stack: ['AWS', 'Terraform', 'CI/CD', 'Data integrations']
 order: 2
 current: false
-description: 'AWS infrastructure, deployment pipelines, and event-driven services for consulting engagements.'
+description: 'Worked on AWS infrastructure and event-driven data ingestion in consulting engagements.'
 ---
 
-- Worked on AWS infrastructure changes, automation, and delivery workflows.
-- Investigated deployment and CI/CD failures.
-- Supported event-driven integrations and data ingestion systems.
+- Worked on AWS infrastructure changes and CI/CD in a consulting team.
+- Investigated deployment failures affecting event-driven services and ingestion workflows.

@@ -2,10 +2,27 @@
 role: 'Infrastructure Support Engineer | Cloud & Platform Engineering'
 username: 'chris'
 hostname: 'portfolio'
-bio: 'I work at AWS as an Infrastructure Support Engineer. I am the senior operations technician on my DCO team, with on-call responsibility across several facilities. Archival-storage break/fix is my specialty, and I spend part of my time automating recurring operations and working on infrastructure projects.'
+bio: >-
+  At AWS, I work as an Infrastructure Support Engineer and serve as the senior
+  operations technician on my DCO team. My on-call rotation covers several
+  buildings. Archival-storage break/fix is where people tend to pull me in,
+  and I've been automating repetitive work for the team.
 aboutMore:
-  - 'Before returning to AWS, I worked in cloud and DevOps consulting on infrastructure changes, deployment pipelines, and event-driven integrations. My lab spans Proxmox, KVM/VFIO passthrough, SAS and ZFS storage, and an ARM64 platform with Ansible, Kubernetes, Flux, and Forgejo.'
-  - 'I have contributed upstream OpenWrt board support, investigated BATMAN-adv mesh networks and switch firmware over UART, and worked on rooted Android devices and head-unit research. Other projects include security labs, private AI services, local developer tools, and offline technical archives. Open-source software, repairability, and privacy matter to me.'
+  - >-
+    Earlier I worked at SingleStone on AWS infrastructure and cloud delivery.
+    I still enjoy digging into the reasons a deployment failed. At home,
+    Proxmox and PCIe passthrough have taken me deep into SAS controller faults
+    and filesystem recovery.
+  - >-
+    My ARM64 platform runs Kubernetes on three Raspberry Pis. Flux pulls its
+    configuration from GitHub; Forgejo has a separate mirror and CI runner.
+    I've also had two RTL9303 switch-support contributions merged into OpenWrt.
+  - >-
+    I've worked on rooted OnePlus devices and spent evenings exploring
+    serial consoles on network hardware. BATMAN-adv mesh experiments
+    have taught me quite a bit about wireless routing. I host my own AI
+    services, and I prefer open-source software that lets me keep
+    using devices long after vendor support ends.
 skills:
   cloud: ['AWS', 'IAM', 'VPC', 'Lambda', 'EventBridge', 'Transfer Family', 'Snowflake']
   delivery: ['Terraform', 'Ansible', 'GitHub Actions', 'Forgejo', 'OCI', 'Flux']
