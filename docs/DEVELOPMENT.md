@@ -85,7 +85,8 @@ Content and application code:
 - `src/layouts/BaseLayout.astro` — metadata and theme restoration
 - `src/components/` — navigation, cards, console, theme picker, footer
 - `src/data/platformArchitecture.ts` — documented platform paths used by the architecture view and console
-- `src/data/credentials.ts` — verified certifications and education status
+- `src/data/credentials.ts` — certification names and education status
+- `src/data/terminalHelp.ts` — console help metadata and command-column formatting
 - `src/styles/` — Tailwind tokens, palettes, global styles
 
 Automation and deployment:
@@ -106,19 +107,28 @@ display order. Project links must be valid URLs.
 The hero and project cards are loaded from these collections. Current AWS work and
 prior consulting appear as separately ordered experience entries. The hero
 supports extra paragraphs in its `aboutMore` list. Credential names and the
-A.A.S. conferral status are maintained in `src/data/credentials.ts`.
+degree statuses are maintained in `src/data/credentials.ts`. Experience entries
+retain dates in their source frontmatter for recordkeeping; the visible page
+and console emphasize `workType` and responsibilities.
 The architecture view and the console's `pipeline` command share
 `src/data/platformArchitecture.ts`, which documents separate GHCR,
 Flux, and Forgejo paths, their recorded checks, and their authority boundaries.
 Compare that data with the platform's public architecture notes when it changes. Other console commands and
 some URLs are still authored in `src/components/HiddenTerminal.astro`.
-The “Further reading” links in `src/pages/index.astro` are also explicit.
+The Test records links in `src/pages/index.astro` are also explicit.
 
 The console is browser-only: it does not execute shell commands, run
 `kubectl`, call GitHub's API, or contact a real cluster. The architecture
 section describes recorded checks, not current service health.
 
 ### Reviewing public copy
+
+Write the action or observation first. Cut abstract claims that need a
+whole paragraph to explain. Read the About section and project descriptions
+aloud: repetitive three-part lists and constructions such as "not X, but Y"
+make technical experience sound rehearsed. Check whether a term is necessary
+for accuracy before removing it. The public text should reflect work actually
+performed.
 
 Use implementation names and observed behavior instead of claims such as
 "reliable" or "production-ready" without supporting tests. Do not imply

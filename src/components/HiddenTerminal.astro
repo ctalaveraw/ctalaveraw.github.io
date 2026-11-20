@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import { architectureConsoleLines, architectureSourceUrl } from '../data/platformArchitecture';
 import { certifications, education } from '../data/credentials';
+import { formatTerminalHelp } from '../data/terminalHelp';
 
 const profile = (await getCollection('hero'))[0]?.data;
 
@@ -15,14 +16,19 @@ const projects = (await getCollection('projects'))
 
 const payload = JSON.stringify({
   role: profile?.role ?? '',
+  helpLines: formatTerminalHelp(),
   experiences: experiences.map((entry) => ({
     company: entry.company,
     role: entry.role,
-    period: entry.period,
+    workType: entry.workType,
     description: entry.description ?? '',
   })),
   credentials: certifications,
-  education: `${education.program} · ${education.institution} · ${education.status}`,
+  education: education.map((entry) => ({
+    degree: entry.degree,
+    institution: entry.institution,
+    status: entry.status,
+  })),
   bio: profile?.bio ?? '',
   aboutMore: profile?.aboutMore ?? [],
   skills: profile?.skills ?? {},
@@ -121,14 +127,15 @@ const payload = JSON.stringify({
 
   type Data = {
     role: string;
+    helpLines: string[];
     experiences: {
       company: string;
       role: string;
-      period: string;
+      workType: string;
       description: string;
     }[];
     credentials: string[];
-    education: string;
+    education: { degree: string; institution: string; status: string }[];
     bio: string;
     aboutMore: string[];
     skills: Record<string, string[]>;
@@ -240,35 +247,7 @@ const payload = JSON.stringify({
 
       switch (command) {
         case 'help':
-          write(
-            [
-              'PROFILE',
-              '  about           background and current work',
-              '  stack           systems and tooling',
-              '  experience      employment history',
-              '  credentials     certifications and education',
-              '  projects        project summaries',
-              '',
-              'ENGINEERING EVIDENCE',
-              '  pipeline        delivery paths and authority boundaries',
-              '  upstream        merged OpenWrt contributions',
-              '  verify          test records and open recovery work',
-              '  links           profile and source',
-              '',
-              'REPOSITORIES',
-              '  open arm        ARM64 platform source',
-              '  open mokerlink  RTL9303 board support',
-              '  open goodtop    SFP+ switch board support',
-              '  git status      portfolio repository',
-              '  kubectl get pods  cluster reference',
-              '',
-              'SESSION',
-              '  history         prior commands',
-              '  clear           clear output',
-              '  exit            close console',
-            ].join('\n'),
-            'text-gray-300 leading-5',
-          );
+          write(data.helpLines.join('\n'), 'text-gray-300 leading-5');
           break;
 
         case 'about':
@@ -286,8 +265,9 @@ const payload = JSON.stringify({
 
         case 'experience':
           data.experiences.forEach((entry) => {
-            write(`${entry.role} · ${entry.company}`, 'text-accent-green');
-            write(`${entry.period} | ${entry.description}`);
+            write(entry.workType, 'text-accent-green');
+            write(`  ${entry.role} · ${entry.company}`);
+            write(`  ${entry.description}`);
           });
           break;
 
@@ -295,7 +275,10 @@ const payload = JSON.stringify({
           write('CERTIFICATIONS', 'text-accent-green');
           data.credentials.forEach((credential) => write(`  ${credential}`));
           write('EDUCATION', 'text-accent-green');
-          write(data.education);
+          data.education.forEach((entry) => {
+            write(`  ${entry.degree} · ${entry.institution}`);
+            write(`  ${entry.status}`);
+          });
           break;
 
         case 'projects':

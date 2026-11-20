@@ -93,7 +93,7 @@ export const architecturePaths: ArchitecturePath[] = [
     description:
       'GitHub CI builds, tests, and scans the ARM64 image. Kubernetes references its published GHCR digest.',
     gate: 'BUILD / TEST / SCAN',
-    evidence: 'Image archive, checksum, image ID, and full registry retrieval were checked.',
+    evidence: 'Checked the image checksum and fetched the published digest from the registry.',
     boundary: 'CI publishes the image; Flux owns workload changes.',
     nodes: ['source', 'build', 'ghcr', 'cluster'],
   },
@@ -102,8 +102,8 @@ export const architecturePaths: ArchitecturePath[] = [
     title: 'Desired state',
     description: 'Flux reads the application manifests from GitHub and reconciles the cluster.',
     gate: 'RECONCILE / TEST DRIFT',
-    evidence: 'Reconciliation, rollback, and drift correction have recorded tests.',
-    boundary: 'Forgejo is not the Flux source of truth.',
+    evidence: 'Test records cover forced drift correction and rollback.',
+    boundary: 'Flux reads its manifests directly from GitHub.',
     nodes: ['source', 'flux', 'cluster'],
   },
   {
