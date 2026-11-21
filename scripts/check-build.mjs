@@ -26,6 +26,11 @@ const required = {
   'Authority boundary shown': homepage.includes('Authority boundary'),
   'Flux source path documented': homepage.includes('Desired state'),
   'OpenWrt projects present': homepage.includes('OpenWrt'),
+  'Repository evidence action': homepage.includes('View repository'),
+  'Merged PR evidence action': homepage.includes('View merged PR'),
+  'Tmux session indicator': homepage.includes('0:portfolio*'),
+  'Theme status indicator': homepage.includes('id="status-theme"'),
+  'Footer console control': homepage.includes('id="open-portfolio-terminal-status"'),
   'MokerLink PR linked': homepage.includes('https://github.com/openwrt/openwrt/pull/25193'),
   'GoodTop PR linked': homepage.includes('https://github.com/openwrt/openwrt/pull/25391'),
   'Portfolio repository linked': homepage.includes(

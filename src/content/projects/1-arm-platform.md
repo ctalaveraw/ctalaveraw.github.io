@@ -4,5 +4,6 @@ description: 'Three-node Raspberry Pi Kubernetes lab. GitHub CI builds and scans
 stack: ['Linux', 'Ansible', 'OCI', 'Kubernetes', 'Flux']
 icon: 'dns'
 link: 'https://github.com/ctalaveraw/arm-homelab-platform'
+linkLabel: 'View repository'
 order: 1
 ---
