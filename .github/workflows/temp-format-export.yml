@@ -4,9 +4,11 @@ on:
   push:
     branches:
       - feat/evidence-backed-lab-notes
+    paths:
+      - .github/workflows/temp-format-export.yml
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   export:
@@ -16,7 +18,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          persist-credentials: false
+          persist-credentials: true
 
       - name: Configure container identity
         run: |
@@ -27,20 +29,14 @@ jobs:
           docker compose build portfolio
           docker compose run --rm --no-deps portfolio sh -euc 'npm ci && npm run format'
 
-      - name: Export formatted file bytes
+      - name: Commit formatting to the feature branch
         run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          import base64
-          import zlib
-
-          paths = [
-              "src/components/Header.astro",
-              "src/components/LabNotes.astro",
-              "src/pages/lab-notes/index.astro",
-              "tests/e2e/lab-notes.spec.ts",
-          ]
-          for path in paths:
-              payload = base64.b64encode(zlib.compress(Path(path).read_bytes(), 9)).decode()
-              print(f"FORMATTED_BLOB {path} {payload}", flush=True)
-          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/components/Header.astro src/components/LabNotes.astro src/pages/lab-notes/index.astro tests/e2e/lab-notes.spec.ts
+          if git diff --cached --quiet; then
+            echo 'No formatting differences'
+            exit 0
+          fi
+          git commit -m 'style: apply pinned formatter to lab note UI'
+          git push origin HEAD:feat/evidence-backed-lab-notes

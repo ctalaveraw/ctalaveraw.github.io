@@ -8,7 +8,7 @@ test('lab notes on the homepage open dated reports with evidence links', async (
   await section.getByRole('link', { name: /Read note: Failed Kubernetes rollout/ }).click();
   await expect(page).toHaveURL(/\/lab-notes\/#2026-10-09-kubernetes-rollout$/);
 
-  const note = page.locator('article#2026-10-09-kubernetes-rollout');
+  const note = page.locator('article[id="2026-10-09-kubernetes-rollout"]');
   await expect(note).toBeVisible();
   await expect(note.getByText('10 of 10').first()).toBeVisible();
   await expect(note.getByRole('heading', { name: 'Public evidence' })).toBeVisible();
@@ -19,7 +19,7 @@ test('lab notes on the homepage open dated reports with evidence links', async (
 
   await page.getByRole('link', { name: 'R5C USB archive I/O failure' }).first().click();
   await expect(page).toHaveURL(/#2026-10-03-r5c-storage$/);
-  await expect(page.locator('article#2026-10-03-r5c-storage')).toContainText(
+  await expect(page.locator('article[id="2026-10-03-r5c-storage"]')).toContainText(
     'root cause',
   );
 });
