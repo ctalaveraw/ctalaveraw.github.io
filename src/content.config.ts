@@ -47,6 +47,26 @@ const experience = defineCollection({
   }),
 });
 
+const labNotes = defineCollection({
+  loader: markdown('lab-notes'),
+  schema: z.object({
+    title: z.string(),
+    summary: z.string(),
+    date: z.iso.date(),
+    status: z.enum(['verified', 'investigated', 'planned']),
+    areas: z.array(z.string()).min(1),
+    order: z.number(),
+    evidence: z
+      .array(
+        z.object({
+          label: z.string(),
+          url: z.url(),
+        }),
+      )
+      .min(1),
+  }),
+});
+
 const contacts = defineCollection({
   loader: markdown('contacts'),
   schema: z.object({
@@ -65,5 +85,6 @@ export const collections = {
   hero,
   projects,
   experience,
+  labNotes,
   contacts,
 };

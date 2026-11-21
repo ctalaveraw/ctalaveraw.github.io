@@ -1,0 +1,60 @@
+---
+import { getCollection } from 'astro:content';
+
+const notes = (await getCollection('labNotes')).sort((a, b) => a.data.order - b.data.order);
+const statusText = {
+  verified: 'Verified',
+  investigated: 'Investigated',
+  planned: 'Planned',
+};
+---
+
+<section id="lab-notes" class="space-y-6" aria-labelledby="lab-notes-title">
+  <div class="flex items-center gap-4">
+    <h2 id="lab-notes-title" class="font-mono text-2xl font-bold">
+      Lab-notes.md
+    </h2>
+    <div class="h-px flex-1 bg-ide-border"></div>
+  </div>
+  <p class="max-w-3xl text-sm leading-7 text-gray-400">
+    Incident records and experiments from the lab, with links to the checks behind each write-up.
+  </p>
+  <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+    {notes.map((note) => (
+      <article class="flex min-w-0 flex-col gap-4 rounded-lg border border-ide-border bg-ide-gray/40 p-5 code-glow">
+        <div class="flex flex-wrap items-center justify-between gap-3 font-mono text-xs">
+          <span class="text-accent-green">{statusText[note.data.status]}</span>
+          <time datetime={note.data.date} class="text-gray-400">
+            {note.data.date}
+          </time>
+        </div>
+        <h3 class="font-mono text-base font-semibold">
+          <a class="hover:text-primary focus-visible:underline" href={`/lab-notes/#${note.id}`}>
+            {note.data.title}
+          </a>
+        </h3>
+        <p class="text-sm leading-6 text-gray-400">{note.data.summary}</p>
+        <div class="flex flex-wrap gap-2">
+          {note.data.areas.map((area) => (
+            <span class="rounded border border-ide-border px-2 py-1 font-mono text-[10px] text-primary">
+              {area}
+            </span>
+          ))}
+        </div>
+        <a
+          href={`/lab-notes/#${note.id}`}
+          class="mt-auto w-fit font-mono text-xs text-primary underline-offset-4 hover:underline focus-visible:underline"
+          aria-label={`Read note: ${note.data.title}`}
+        >
+          Read note
+        </a>
+      </article>
+    ))}
+  </div>
+  <a
+    href="/lab-notes/"
+    class="inline-block font-mono text-sm text-primary underline-offset-4 hover:underline"
+  >
+    Read all lab notes
+  </a>
+</section>

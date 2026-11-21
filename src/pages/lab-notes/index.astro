@@ -1,0 +1,146 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ThemePicker from '../../components/ThemePicker.astro';
+
+const entries = (await getCollection('labNotes')).sort((a, b) => a.data.order - b.data.order);
+const notes = await Promise.all(
+  entries.map(async (entry) => ({
+    id: entry.id,
+    data: entry.data,
+    Content: (await render(entry)).Content,
+  })),
+);
+const statusText = {
+  verified: 'Verified',
+  investigated: 'Investigated',
+  planned: 'Planned',
+};
+---
+
+<BaseLayout
+  title="Lab notes | Christian Talavera"
+  description="Dated infrastructure investigations, test records and recovery notes with public source evidence."
+>
+  <header class="sticky top-0 z-50 flex h-12 items-center justify-between gap-3 border-b border-ide-border bg-ide-gray px-5 font-mono text-xs">
+    <a href="/#lab-notes" class="text-primary hover:underline focus-visible:underline">
+      infra.lab / home
+    </a>
+    <ThemePicker />
+  </header>
+
+  <main class="mx-auto max-w-4xl space-y-10 px-5 py-10 pb-24">
+    <div>
+      <p class="mb-3 font-mono text-xs text-accent-green">~/portfolio/lab-notes</p>
+      <h1 class="mb-4 font-mono text-3xl font-bold">Lab notes</h1>
+      <p class="max-w-2xl text-sm leading-7 text-gray-400">
+        Field notes from lab failures and controlled tests. Each entry links to the public incident
+        record or implementation decision. Status applies to the recorded test, with open questions
+        listed alongside the observations.
+      </p>
+    </div>
+
+    <nav aria-label="Lab note index" class="rounded-lg border border-ide-border bg-ide-gray/40 p-5">
+      <h2 class="mb-3 font-mono text-sm font-semibold">Index</h2>
+      <ol class="space-y-3">
+        {notes.map((note) => (
+          <li class="flex flex-wrap items-baseline gap-2 text-sm">
+            <time datetime={note.data.date} class="font-mono text-xs text-gray-400">
+              {note.data.date}
+            </time>
+            <a class="text-primary hover:underline focus-visible:underline" href={`#${note.id}`}>
+              {note.data.title}
+            </a>
+          </li>
+        ))}
+      </ol>
+    </nav>
+
+    {notes.map((note) => (
+      <article
+        id={note.id}
+        aria-labelledby={`${note.id}-title`}
+        class="min-w-0 scroll-mt-20 rounded-lg border border-ide-border bg-ide-gray/40 p-5 sm:p-8"
+      >
+        <div class="mb-4 flex flex-wrap items-center gap-3 font-mono text-xs">
+          <span class="text-accent-green">{statusText[note.data.status]}</span>
+          <time datetime={note.data.date} class="text-gray-400">
+            {note.data.date}
+          </time>
+          {note.data.areas.map((area) => (
+            <span class="rounded border border-ide-border px-2 py-1 text-primary">{area}</span>
+          ))}
+        </div>
+        <h2 id={`${note.id}-title`} class="mb-4 font-mono text-xl font-bold">
+          {note.data.title}
+        </h2>
+        <p class="mb-6 text-sm leading-7 text-gray-400">{note.data.summary}</p>
+        <div class="lab-note-body max-w-none text-sm leading-7">
+          <note.Content />
+        </div>
+        <div class="mt-8 border-t border-ide-border pt-5">
+          <h3 class="mb-3 font-mono text-sm font-semibold">Public evidence</h3>
+          <ul class="space-y-2">
+            {note.data.evidence.map((source) => (
+              <li>
+                <a
+                  class="break-words text-sm text-primary underline-offset-4 hover:underline focus-visible:underline"
+                  href={source.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {source.label}
+                  <span class="sr-only"> (opens in a new tab)</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </article>
+    ))}
+
+    <a href="/#lab-notes" class="inline-block font-mono text-sm text-primary hover:underline">
+      Return to portfolio
+    </a>
+  </main>
+</BaseLayout>
+
+<style is:global>
+  .lab-note-body h3 {
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: var(--color-foreground);
+    font-family: var(--font-mono);
+    font-weight: 600;
+  }
+
+  .lab-note-body p,
+  .lab-note-body ul {
+    margin-bottom: 1rem;
+  }
+
+  .lab-note-body ul {
+    list-style: disc;
+    padding-left: 1.5rem;
+  }
+
+  .lab-note-body li {
+    padding-left: 0.2rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .lab-note-body code {
+    overflow-wrap: anywhere;
+    color: var(--color-primary);
+    font-family: var(--font-mono);
+  }
+
+  .lab-note-body pre {
+    max-width: 100%;
+    overflow-x: auto;
+    border: 1px solid var(--color-ide-border);
+    border-radius: 0.4rem;
+    padding: 1rem;
+    background: var(--color-bg-dark);
+  }
+</style>
