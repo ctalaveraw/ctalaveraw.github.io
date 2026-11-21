@@ -204,15 +204,32 @@ development container, CDN-hosted fonts, or browser behavior. Do not
 describe a passing high-severity audit as zero vulnerabilities unless the
 complete audit output actually shows zero.
 
-### Browser review before a release
+### Automated browser checks
 
-Check the built or public site on desktop and a narrow viewport. Exercise
-the IDE navigation, close/restore tabs, project evidence buttons, the
-footer console button, all public links, color presets,
-custom colors across a refresh, and the console through its button and
-keyboard shortcuts (Ctrl/Cmd+K, backtick, Escape, history, completion).
-Also inspect keyboard focus, text contrast, and reduced-motion behavior.
-These checks are manual in the current repository.
+Playwright tests the generated static site in Chromium. The tests are in
+`tests/e2e/`; `playwright.config.ts` starts an Astro preview server
+inside the browser container. The Playwright package and browser image both
+use version 1.65.1.
+
+On a rootful Docker host, configure `.env` and run:
+
+```sh
+bash scripts/test-browser.sh
+```
+
+The runner builds `dist/` using the Node 22 development image, then runs
+Playwright in the browser image. It leaves existing development services
+alone. GitHub Actions runs the same command in the separate `browser` job.
+
+Tests cover tab close/restore, console commands and focus restoration,
+theme persistence, architecture keyboard expansion, reduced-motion
+interaction, and narrow-viewport overflow. Failure traces, screenshots,
+and the HTML report are written to `test-results/` and
+`playwright-report/`; Git ignores both.
+
+Manual review still covers text contrast across all palettes, external
+URLs, screen-reader behavior, and rendering in Firefox and WebKit. The
+initial automated suite uses Chromium.
 
 ## Pull requests and publishing
 
@@ -225,7 +242,8 @@ The action runtime is separate from the Node.js 22 container used to
 build and validate the site.
 
 **Portfolio CI** (`.github/workflows/validate.yml`) runs on pull requests
-and pushes to `main`. It creates the local `.env` from the runner's UID/GID,
+and pushes to `main`. It runs separate `verify` and `browser` jobs.
+The `verify` job creates `.env` from the runner's UID/GID,
 builds the development image, runs `npm ci && npm run verify` in Compose,
 and uploads `dist/` as a short-lived build artifact.
 

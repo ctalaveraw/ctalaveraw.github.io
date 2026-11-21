@@ -40,3 +40,32 @@ jobs:
           name: portfolio-preview
           path: dist/
           retention-days: 7
+
+  browser:
+    name: browser
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Configure container identity
+        run: |
+          printf 'RUN_AS=%s:%s\n' "$(id -u)" "$(id -g)" > .env
+
+      - name: Run browser checks
+        run: bash scripts/test-browser.sh
+
+      - name: Upload browser failure evidence
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: browser-failures
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
+          retention-days: 7

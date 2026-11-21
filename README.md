@@ -59,7 +59,8 @@ docker compose run --rm --no-deps portfolio \
 ```
 
 The verification runner checks ShellCheck, formatting, ESLint, Astro diagnostics,
-the production build, generated pages, and npm advisories. See
+the production build, generated pages, and npm advisories.
+Run browser interaction checks with `bash scripts/test-browser.sh`. See
 [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) for the full workflow, content layout,
 and troubleshooting.
 

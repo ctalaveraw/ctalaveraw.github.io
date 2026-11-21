@@ -15,3 +15,17 @@ services:
       - '127.0.0.1:4321:4321'
     command: >
       sh -ec "npm ci && exec ./node_modules/.bin/astro dev --host 0.0.0.0 --ignore-lock"
+  browser:
+    profiles: ['test']
+    image: mcr.microsoft.com/playwright:v1.65.1-noble
+    init: true
+    ipc: host
+    working_dir: /workspace
+    user: '${RUN_AS:?Set RUN_AS before using Compose}'
+    environment:
+      HOME: /tmp
+      npm_config_cache: /tmp/npm-cache
+      ASTRO_TELEMETRY_DISABLED: '1'
+    volumes:
+      - .:/workspace
+    command: npm run test:e2e
