@@ -45,7 +45,9 @@ const statusText = {
       <ol class="space-y-3">
         {notes.map((note) => (
           <li class="flex flex-wrap items-baseline gap-2 text-sm">
-            <time datetime={note.data.date} class="font-mono text-xs text-gray-400">{note.data.date}</time>
+            <time datetime={note.data.date} class="font-mono text-xs text-gray-400">
+              {note.data.date}
+            </time>
             <a class="text-primary hover:underline focus-visible:underline" href={`#${note.id}`}>
               {note.data.title}
             </a>
@@ -62,7 +64,9 @@ const statusText = {
       >
         <div class="mb-4 flex flex-wrap items-center gap-3 font-mono text-xs">
           <span class="text-accent-green">{statusText[note.data.status]}</span>
-          <time datetime={note.data.date} class="text-gray-400">{note.data.date}</time>
+          <time datetime={note.data.date} class="text-gray-400">
+            {note.data.date}
+          </time>
           {note.data.areas.map((area) => (
             <span class="rounded border border-ide-border px-2 py-1 text-primary">{area}</span>
           ))}

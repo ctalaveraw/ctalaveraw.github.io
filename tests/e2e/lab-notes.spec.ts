@@ -12,16 +12,16 @@ test('lab notes on the homepage open dated reports with evidence links', async (
   await expect(note).toBeVisible();
   await expect(note.getByText('10 of 10').first()).toBeVisible();
   await expect(note.getByRole('heading', { name: 'Public evidence' })).toBeVisible();
-  await expect(note.getByRole('link', { name: /Incident record and captured observations/ })).toHaveAttribute(
+  await expect(
+    note.getByRole('link', { name: /Incident record and captured observations/ }),
+  ).toHaveAttribute(
     'href',
     /arm-homelab-platform\/blob\/main\/docs\/incidents\/2026-10-09-platform-hello-failed-rollout.md$/,
   );
 
   await page.getByRole('link', { name: 'R5C USB archive I/O failure' }).first().click();
   await expect(page).toHaveURL(/#2026-10-03-r5c-storage$/);
-  await expect(page.locator('article[id="2026-10-03-r5c-storage"]')).toContainText(
-    'root cause',
-  );
+  await expect(page.locator('article[id="2026-10-03-r5c-storage"]')).toContainText('root cause');
 });
 
 test.describe('lab notes on mobile', () => {

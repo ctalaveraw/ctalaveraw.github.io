@@ -11,7 +11,9 @@ const statusText = {
 
 <section id="lab-notes" class="space-y-6" aria-labelledby="lab-notes-title">
   <div class="flex items-center gap-4">
-    <h2 id="lab-notes-title" class="font-mono text-2xl font-bold">Lab-notes.md</h2>
+    <h2 id="lab-notes-title" class="font-mono text-2xl font-bold">
+      Lab-notes.md
+    </h2>
     <div class="h-px flex-1 bg-ide-border"></div>
   </div>
   <p class="max-w-3xl text-sm leading-7 text-gray-400">
@@ -22,7 +24,9 @@ const statusText = {
       <article class="flex min-w-0 flex-col gap-4 rounded-lg border border-ide-border bg-ide-gray/40 p-5 code-glow">
         <div class="flex flex-wrap items-center justify-between gap-3 font-mono text-xs">
           <span class="text-accent-green">{statusText[note.data.status]}</span>
-          <time datetime={note.data.date} class="text-gray-400">{note.data.date}</time>
+          <time datetime={note.data.date} class="text-gray-400">
+            {note.data.date}
+          </time>
         </div>
         <h3 class="font-mono text-base font-semibold">
           <a class="hover:text-primary focus-visible:underline" href={`/lab-notes/#${note.id}`}>
@@ -47,7 +51,10 @@ const statusText = {
       </article>
     ))}
   </div>
-  <a href="/lab-notes/" class="inline-block font-mono text-sm text-primary underline-offset-4 hover:underline">
+  <a
+    href="/lab-notes/"
+    class="inline-block font-mono text-sm text-primary underline-offset-4 hover:underline"
+  >
     Read all lab notes
   </a>
 </section>
