@@ -6,10 +6,27 @@ const root = process.cwd();
 const path = (file) => resolve(root, file);
 
 const homepage = readFileSync(path('dist/index.html'), 'utf8');
+const notesPagePath = path('dist/lab-notes/index.html');
+const notesPage = existsSync(notesPagePath) ? readFileSync(notesPagePath, 'utf8') : '';
 
 const required = {
   'Homepage generated': existsSync(path('dist/index.html')),
   '404 page generated': existsSync(path('dist/404.html')),
+  'Lab notes index generated': existsSync(notesPagePath),
+  'Home lab notes preview': homepage.includes('id="lab-notes"'),
+  'Home lab notes navigation': homepage.includes('lab-notes.md'),
+  'First lab note linked': homepage.includes('/lab-notes/#2026-10-09-kubernetes-rollout'),
+  'Second lab note linked': homepage.includes('/lab-notes/#2026-10-03-r5c-storage'),
+  'Kubernetes recovery notes rendered': notesPage.includes('10 of 10'),
+  'R5C storage incident rendered': notesPage.includes('sectors'),
+  'Recorded verification status': notesPage.includes('Verified'),
+  'Unresolved incident status': notesPage.includes('Investigated'),
+  'Kubernetes incident source linked': notesPage.includes(
+    'https://github.com/ctalaveraw/arm-homelab-platform/blob/main/docs/incidents/2026-10-09-platform-hello-failed-rollout.md',
+  ),
+  'R5C incident source linked': notesPage.includes(
+    'https://github.com/ctalaveraw/arm-homelab-platform/blob/main/docs/incidents/2026-10-03-usb-storage.md',
+  ),
   'Favicon generated': existsSync(path('dist/favicon.svg')),
   'Correct portfolio identity': homepage.includes('Christian Talavera'),
   'Current AWS support role': homepage.includes('Infrastructure Support Engineer'),

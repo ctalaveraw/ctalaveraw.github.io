@@ -21,6 +21,13 @@ merged OpenWrt device-support contributions.
 - **[GoodTop GT-SWTXG8FM](https://github.com/openwrt/openwrt/pull/25391)** —
   Merged OpenWrt board support for an RTL9303-based 8-port SFP+ switch.
 
+## Lab notes
+
+The [lab notes](https://ctalaveraw.github.io/lab-notes/) cover two dated
+investigations: a failed Kubernetes image rollout with a tested rollback,
+and an unresolved R5C USB-storage failure. The notes separate observed
+behavior from remaining work and link to public incident records.
+
 ## Site
 
 The frontend uses Astro 7, Tailwind CSS 4, and Markdown-backed content collections.
@@ -68,12 +75,12 @@ and troubleshooting.
 
 Changes go through pull requests against protected `main`.
 
-- [Portfolio CI](.github/workflows/validate.yml) runs `npm run verify` and
-  uploads a short-lived build artifact.
+- [Portfolio CI](.github/workflows/validate.yml) runs `verify` and Chromium
+  `browser` jobs, and uploads short-lived artifacts.
 - [Publish portfolio](.github/workflows/pages.yml) builds, verifies, and deploys
   `dist/` to GitHub Pages after a push to `main`.
-- The `verify` status check is required by the repository's `protect-main`
-  ruleset.
+- The `verify` and `browser` status checks are required by the repository's
+  `protect-main` ruleset.
 
 Do not commit `.env`, credentials, private infrastructure details, or
 employer/customer-confidential data.

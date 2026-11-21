@@ -79,9 +79,10 @@ Content and application code:
 - `src/content.config.ts` — collection loaders and schemas
 - `src/content/hero/` — introduction, project history, and technology groups
 - `src/content/projects/` — project cards and links
+- `src/content/lab-notes/` — dated investigations and evidence links
 - `src/content/experience/` — experience timeline and highlights
 - `src/content/contacts/` — contact and source links
-- `src/pages/` — home and 404 routes
+- `src/pages/` — home, lab-notes index, and 404 routes
 - `src/layouts/BaseLayout.astro` — metadata and theme restoration
 - `src/components/` — navigation, cards, console, theme picker, footer
 - `src/data/platformArchitecture.ts` — documented platform paths used by the architecture view and console
@@ -101,9 +102,24 @@ Automation and deployment:
 
 Markdown files in `src/content/` have YAML frontmatter validated by
 `src/content.config.ts`. Add or modify a file in the appropriate collection.
-Projects and experience entries use a numeric `order` field to control
-display order. Project links must be valid URLs. Project cards use `linkLabel`
-(`View repository` or `View merged PR`) to describe the linked evidence.
+Projects, lab notes and experience entries use a numeric `order` field to
+control display order. Project links must be valid URLs. Project cards use
+`linkLabel` (`View repository` or `View merged PR`) to describe the linked
+evidence.
+
+Lab notes use a separate `labNotes` collection. Each Markdown file needs a
+title, summary, ISO date, status (`verified`, `investigated` or `planned`),
+technology areas, order and at least one public evidence URL. The Markdown
+body contains the methods, observations and outstanding work. The homepage
+shows a preview; `/lab-notes/` renders the full entries.
+
+The status refers only to the recorded investigation. `Verified` requires
+actual recorded checks and does not imply the platform is healthy today.
+`Investigated` means the observations are documented but the cause or
+recovery remains unsettled. `Planned` is for future work and must not be
+presented as completed. Link to public upstream records or source commits.
+Do not link private repositories, post internal addresses or copy firmware
+images, credentials, employer information or device identifiers.
 
 The hero and project cards are loaded from these collections. Current AWS work and
 prior consulting appear as separately ordered experience entries. The hero
@@ -178,8 +194,8 @@ docker compose run --rm --no-deps portfolio \
 
 The runner stops at the first failure and writes a summary to
 `GITHUB_STEP_SUMMARY` when run in GitHub Actions. Output tests cover
-the homepage, 404 page, favicon, project links, and selected template
-content that must not reappear. **They do not replace browser or
+the homepage, lab-notes index, source links, 404 page, favicon, project
+links, and selected template content that must not reappear. **They do not replace browser or
 accessibility testing.**
 
 Apply formatting deliberately:
@@ -222,8 +238,8 @@ Playwright in the browser image. It leaves existing development services
 alone. GitHub Actions runs the same command in the separate `browser` job.
 
 Tests cover tab close/restore, console commands and focus restoration,
-theme persistence, architecture keyboard expansion, reduced-motion
-interaction, and narrow-viewport overflow. Failure traces, screenshots,
+theme persistence, architecture keyboard expansion, lab-note navigation,
+reduced-motion interaction, and narrow-viewport overflow. Failure traces, screenshots,
 and the HTML report are written to `test-results/` and
 `playwright-report/`; Git ignores both.
 
