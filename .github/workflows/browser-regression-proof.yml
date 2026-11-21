@@ -1,0 +1,56 @@
+name: Temporary browser regression proof
+
+on:
+  push:
+    branches:
+      - test/playwright-browser-interactions
+
+permissions:
+  contents: read
+
+jobs:
+  regression-proof:
+    name: regression-proof
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Configure container identity
+        run: |
+          printf 'RUN_AS=%s:%s\n' "$(id -u)" "$(id -g)" > .env
+
+      - name: Disable console button handler in disposable checkout
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path('src/components/HiddenTerminal.astro')
+          before = "document.getElementById(id)?.addEventListener('click', open);"
+          source = path.read_text()
+          assert source.count(before) == 1, 'unexpected terminal source'
+          path.write_text(source.replace(before, '// disabled by regression proof'))
+          PY
+
+      - name: Browser test must detect the regression
+        run: |
+          docker compose build portfolio
+          docker compose run --rm --no-deps portfolio sh -euc 'npm ci && npm run build'
+          set +e
+          docker compose run --rm --no-deps browser npm run test:e2e -- --grep 'console commands work' --workers=1 --retries=0 > regression.log 2>&1
+          status=$?
+          set -e
+          tail -n 70 regression.log
+
+          if (( status == 0 )); then
+            echo 'FAIL: browser test did not detect disabled trigger'
+            exit 1
+          fi
+
+          if ! grep -q 'toBeVisible' regression.log; then
+            echo 'FAIL: browser test failed for an unrelated reason'
+            exit 1
+          fi
+
+          echo 'PASS: console interaction regression detected'
