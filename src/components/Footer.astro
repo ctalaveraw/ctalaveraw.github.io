@@ -71,7 +71,8 @@ const contact = entries[0]?.data;
     function updateThemeLabel() {
       const current = root.dataset.theme ?? 'github';
       const preset = presets.find((choice) => choice.dataset.themePreset === current);
-      themeLabel!.textContent = preset?.textContent?.trim() ?? (current === 'custom' ? 'Custom' : current);
+      const label = preset?.textContent?.trim() ?? (current === 'custom' ? 'Custom' : current);
+      themeLabel!.textContent = label;
     }
 
     updateThemeLabel();
