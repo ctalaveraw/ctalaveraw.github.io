@@ -26,17 +26,42 @@ const contact = entries[0]?.data;
   </div>
 </section>
 
-<footer class="fixed bottom-0 inset-x-0 z-50 bg-ide-status border-t border-ide-border h-7 px-4 flex items-center justify-between gap-3 text-[11px] font-mono">
-  <span class="text-accent-green">Static site · Astro</span>
+<footer
+  id="portfolio-status"
+  class="fixed bottom-0 inset-x-0 z-50 bg-ide-status border-t border-ide-border h-8 px-2 sm:px-4 flex items-center gap-3 text-[11px] font-mono"
+>
+  <div class="flex min-w-0 shrink-0 items-center gap-2">
+    <span class="rounded-sm bg-primary px-2 py-1 font-semibold text-bg-dark">0:portfolio*</span>
+    <span class="hidden md:inline text-gray-400">public session</span>
+  </div>
 
-  <span class="hidden sm:inline text-gray-400">Terminal: Ctrl+K</span>
+  <div class="ml-auto flex min-w-0 items-center gap-3">
+    <span class="min-w-0 truncate text-gray-400">
+      theme:{' '}
+      <span id="status-theme" class="text-foreground">
+        GitHub
+      </span>
+    </span>
 
-  <a
-    href="https://github.com/HoPHNiDev/hophni.dev"
-    target="_blank"
-    rel="noopener noreferrer"
-    class="text-primary hover:underline"
-  >
-    Based on HoPHNi
-  </a>
+    <button
+      id="open-portfolio-terminal-status"
+      type="button"
+      title="Open portfolio console (Ctrl+K)"
+      aria-label="Open portfolio console"
+      class="shrink-0 rounded border border-ide-border px-2 py-0.5 text-primary hover:border-primary focus-visible:outline-offset-2"
+    >
+      ^K <span class="hidden sm:inline">console</span>
+    </button>
+
+    <a
+      href="https://github.com/HoPHNiDev/hophni.dev"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="hidden lg:inline shrink-0 text-primary hover:underline"
+    >
+      HoPHNi
+    </a>
+  </div>
 </footer>
+
+<script src="../scripts/statusTheme.ts"></script>

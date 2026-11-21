@@ -28,6 +28,7 @@ const projects = defineCollection({
     stack: z.array(z.string()),
     icon: z.string(),
     link: z.url(),
+    linkLabel: z.enum(['View repository', 'View merged PR']),
     order: z.number(),
   }),
 });

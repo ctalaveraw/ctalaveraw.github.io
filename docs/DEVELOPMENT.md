@@ -102,7 +102,8 @@ Automation and deployment:
 Markdown files in `src/content/` have YAML frontmatter validated by
 `src/content.config.ts`. Add or modify a file in the appropriate collection.
 Projects and experience entries use a numeric `order` field to control
-display order. Project links must be valid URLs.
+display order. Project links must be valid URLs. Project cards use `linkLabel`
+(`View repository` or `View merged PR`) to describe the linked evidence.
 
 The hero and project cards are loaded from these collections. Current AWS work and
 prior consulting appear as separately ordered experience entries. The hero
@@ -143,6 +144,11 @@ and the platform evidence ledger.
 `src/styles/themes.css` contains 13 named presets.
 `src/components/ThemePicker.astro` implements the picker and editor.
 `src/layouts/BaseLayout.astro` restores saved preferences on page load.
+
+The footer displays the active theme by observing `data-theme` on the root
+HTML element. The theme selector remains the owner of theme changes and
+persisted color settings; the footer only reads the selected name. The
+`^K console` footer button opens the same read-only console as the header.
 
 Preferences use browser `localStorage` keys `portfolio-theme` and
 `portfolio-custom-colors`. Custom values are limited to the defined CSS
@@ -201,7 +207,8 @@ complete audit output actually shows zero.
 ### Browser review before a release
 
 Check the built or public site on desktop and a narrow viewport. Exercise
-the IDE navigation, close/restore tabs, all public links, color presets,
+the IDE navigation, close/restore tabs, project evidence buttons, the
+footer console button, all public links, color presets,
 custom colors across a refresh, and the console through its button and
 keyboard shortcuts (Ctrl/Cmd+K, backtick, Escape, history, completion).
 Also inspect keyboard focus, text contrast, and reduced-motion behavior.
