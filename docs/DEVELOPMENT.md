@@ -231,7 +231,6 @@ Manual review still covers text contrast across all palettes, external
 URLs, screen-reader behavior, and rendering in Firefox and WebKit. The
 initial automated suite uses Chromium.
 
-
 ## Pull requests and publishing
 
 The repository uses feature branches and a protected `main`. The
@@ -243,7 +242,8 @@ The action runtime is separate from the Node.js 22 container used to
 build and validate the site.
 
 **Portfolio CI** (`.github/workflows/validate.yml`) runs on pull requests
-and pushes to `main`. It runs separate `verify` and `browser` jobs. It creates the local `.env` from the runner's UID/GID,
+and pushes to `main`. It runs separate `verify` and `browser` jobs.
+The `verify` job creates `.env` from the runner's UID/GID,
 builds the development image, runs `npm ci && npm run verify` in Compose,
 and uploads `dist/` as a short-lived build artifact.
 
