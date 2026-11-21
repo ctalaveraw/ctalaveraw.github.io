@@ -61,24 +61,4 @@ const contact = entries[0]?.data;
   </div>
 </footer>
 
-<script>
-  const themeLabel = document.getElementById('status-theme');
-
-  if (themeLabel) {
-    const root = document.documentElement;
-    const presets = Array.from(document.querySelectorAll<HTMLElement>('[data-theme-preset]'));
-
-    function updateThemeLabel() {
-      const current = root.dataset.theme ?? 'github';
-      const preset = presets.find((choice) => choice.dataset.themePreset === current);
-      const label = preset?.textContent?.trim() ?? (current === 'custom' ? 'Custom' : current);
-      themeLabel!.textContent = label;
-    }
-
-    updateThemeLabel();
-    new MutationObserver(updateThemeLabel).observe(root, {
-      attributes: true,
-      attributeFilter: ['data-theme'],
-    });
-  }
-</script>
+<script src="../scripts/statusTheme.ts"></script>
