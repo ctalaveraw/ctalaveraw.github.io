@@ -1,0 +1,46 @@
+name: Temporary formatting export
+
+on:
+  push:
+    branches:
+      - feat/evidence-backed-lab-notes
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    name: format-export
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Configure container identity
+        run: |
+          printf 'RUN_AS=%s:%s\n' "$(id -u)" "$(id -g)" > .env
+
+      - name: Apply repository formatter
+        run: |
+          docker compose build portfolio
+          docker compose run --rm --no-deps portfolio sh -euc 'npm ci && npm run format'
+
+      - name: Export formatted file bytes
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import base64
+          import zlib
+
+          paths = [
+              "src/components/Header.astro",
+              "src/components/LabNotes.astro",
+              "src/pages/lab-notes/index.astro",
+              "tests/e2e/lab-notes.spec.ts",
+          ]
+          for path in paths:
+              payload = base64.b64encode(zlib.compress(Path(path).read_bytes(), 9)).decode()
+              print(f"FORMATTED_BLOB {path} {payload}", flush=True)
+          PY
